@@ -1,1 +1,1 @@
-Drop your birthday track here as song.mp3 (or change CONFIG.music in app.js).
+Optional: drop your own track here as song.mp3 and it replaces the built-in romantic score.

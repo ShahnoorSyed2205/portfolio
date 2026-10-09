@@ -4,7 +4,7 @@ Open `index.html` directly, or serve the folder / drop it on any static host (Ve
 
 ## Make it yours (all in `app.js` → `CONFIG`)
 - `name`, `from`: shown across the page and as the letter sign-off.
-- `music`: path to **your** track. Drop it at `music/song.mp3` (or change the path). The music button mutes/unmutes it. No file = no music.
+- `music`: optional. A soft romantic generative score plays by default (no birthday song). To use your own track instead, drop it at `music/song.mp3`. The music button mutes/unmutes either.
 - `work`: her Aim to Crochet photos. Drop square-ish images into `img/work/` using the names in `CONFIG.work`; missing ones are skipped and the section still looks right without them.
 - `wishes`: the twelve messages hidden in the 3D objects.
 

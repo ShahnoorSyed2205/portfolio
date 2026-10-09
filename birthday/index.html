@@ -9,6 +9,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Great+Vibes&family=Jost:wght@300;400;500&family=Fredoka:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='48' fill='%23f6dfb8'/%3E%3Crect x='31' y='30' width='38' height='56' rx='17' fill='%23dba35d'/%3E%3Crect x='31' y='46' width='38' height='17' fill='%23fff4e0'/%3E%3Cellipse cx='50' cy='27' rx='25' ry='6' fill='%235a3315'/%3E%3Cpath d='M33 27q0-14 17-14t17 14z' fill='%236b3f1c'/%3E%3Ccircle cx='43' cy='52' r='2.6'/%3E%3Ccircle cx='57' cy='52' r='2.6'/%3E%3C/svg%3E">
 <link rel="stylesheet" href="styles.css">
 </head>
 <body class="locked">
@@ -19,6 +20,20 @@
     <radialGradient id="sf-core" cx="50%" cy="45%" r="55%">
       <stop offset="0" stop-color="#7a4a1c"/><stop offset="1" stop-color="#2b1507"/>
     </radialGradient>
+    <symbol id="logo" viewBox="0 0 100 100">
+      <circle cx="50" cy="50" r="48" fill="#f6dfb8"/>
+      <circle cx="50" cy="50" r="48" fill="none" stroke="#c98a3a" stroke-width="2" stroke-dasharray="3 4"/>
+      <circle cx="50" cy="15" r="7" fill="none" stroke="#c9a86a" stroke-width="2.6"/>
+      <rect x="31" y="30" width="38" height="56" rx="17" fill="#dba35d"/>
+      <rect x="31" y="46" width="38" height="17" fill="#fff4e0"/>
+      <path d="M31 31 q19 -9 38 0 v5 q-19 6 -38 0z" fill="#dba35d"/>
+      <rect x="31" y="46" width="38" height="17" fill="#fff4e0"/>
+      <ellipse cx="50" cy="27" rx="25" ry="6" fill="#5a3315"/>
+      <path d="M33 27 q0 -14 17 -14 q17 0 17 14z" fill="#6b3f1c"/>
+      <circle cx="43" cy="52" r="2.4" fill="#1a0f0a"/><circle cx="57" cy="52" r="2.4" fill="#1a0f0a"/>
+      <path d="M45 58 q5 4.5 10 0" fill="none" stroke="#1a0f0a" stroke-width="2" stroke-linecap="round"/>
+      <circle cx="39" cy="57" r="3" fill="#f5a3b5" opacity=".8"/><circle cx="61" cy="57" r="3" fill="#f5a3b5" opacity=".8"/>
+    </symbol>
     <symbol id="sf" viewBox="-50 -50 100 100">
       <g fill="#ffc61a" stroke="#e8a317" stroke-width="1">
         <g id="sf-ring">
@@ -224,7 +239,7 @@
     <div class="wrap center">
       <header class="sec-head reveal">
         <p class="eyebrow">The little shop of wonders</p>
-        <h2 class="wordmark script"><svg aria-hidden="true"><use href="#sf"/></svg>Aim to Crochet</h2>
+        <h2 class="wordmark script"><svg class="logo-mark" aria-hidden="true"><use href="#logo"/></svg>Aim to Crochet</h2>
         <p class="lead">Tiny stitched treasures. Always here to smile.</p>
         <span class="handle">@aim_to_crochet</span>
       </header>

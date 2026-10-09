@@ -8,7 +8,7 @@
   var CONFIG = {
     name: 'Aiman',          // her name, shown across the page
     from: 'Syeda, your Charlie', // sign-off on the letter
-    music: 'music/song.mp3', // YOUR track (drop the file in birthday/music/). Leave '' for no music.
+    music: 'music/song.mp3', // optional: your own track. If the file is missing, a soft romantic score plays instead.
     work: [                 // Aim to Crochet photos: drop files in img/work/ (missing ones are skipped)
       ['sunflower-hairtie.jpg', 'The sunflower hair tie. Her signature.'],
       ['sunflower-bag.jpg', 'A sunflower purse, stitched by hand.'],
@@ -89,6 +89,61 @@
       tone(freq * 2, t, (dur || 1.2) * .5, vol * .3, 'sine');
     }
 
+    /* ---------- romantic generative score (plays unless music/song.mp3 exists) ---------- */
+    var mtof = function (n) { return 440 * Math.pow(2, (n - 69) / 12); };
+    var CHORDS = [   // Cmaj7 - Am7 - Fmaj7 - G(add9): slow, warm, hopeful
+      { bass: 36, tones: [60, 64, 67, 71, 72, 76, 79] },
+      { bass: 33, tones: [57, 60, 64, 67, 69, 72, 76] },
+      { bass: 29, tones: [53, 57, 60, 64, 65, 69, 72] },
+      { bass: 31, tones: [55, 59, 62, 64, 67, 71, 74] }
+    ];
+    var PATTERN = [0, 2, 4, 2, 3, 5, 4, 2], MELODY = [[4, 6], [5, 3], [6, 4], [3, 5]];
+    var BEAT = 60 / 66, synthOn = false, nextBar = 0, barIdx = 0, musicBus, notes = 0;
+
+    function pluck(freq, t, vol, dur) {   // soft felt-piano-ish tone
+      var o = ctx.createOscillator(), o2 = ctx.createOscillator(), g = ctx.createGain(), lp = ctx.createBiquadFilter();
+      o.type = 'sine'; o2.type = 'triangle'; o.frequency.value = freq; o2.frequency.value = freq * 2.003;
+      lp.type = 'lowpass'; lp.frequency.setValueAtTime(freq * 6, t); lp.frequency.exponentialRampToValueAtTime(freq * 1.6, t + dur);
+      g.gain.setValueAtTime(0.0001, t); g.gain.linearRampToValueAtTime(vol, t + .012); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+      var g2 = ctx.createGain(); g2.gain.value = .22;
+      o.connect(lp); o2.connect(g2); g2.connect(lp); lp.connect(g); g.connect(musicBus); g.connect(master.reverb);
+      o.start(t); o2.start(t); o.stop(t + dur + .05); o2.stop(t + dur + .05); notes++;
+    }
+    function padNote(freq, t, dur, vol) {
+      [-5, 5].forEach(function (det) {
+        var o = ctx.createOscillator(), g = ctx.createGain();
+        o.type = 'sine'; o.frequency.value = freq; o.detune.value = det;
+        g.gain.setValueAtTime(0.0001, t); g.gain.linearRampToValueAtTime(vol, t + dur * .35); g.gain.linearRampToValueAtTime(0.0001, t + dur + 1.2);
+        o.connect(g); g.connect(musicBus); g.connect(master.reverb); o.start(t); o.stop(t + dur + 1.3);
+      });
+    }
+    function scheduleBar(t) {
+      var ch = CHORDS[barIdx % CHORDS.length], bar = BEAT * 4, v = .9 + Math.random() * .2;
+      pluck(mtof(ch.bass), t, .09, bar * 1.1);                 // bass
+      pluck(mtof(ch.bass + 12), t + BEAT * 2.5, .045, BEAT * 2);
+      [ch.tones[0], ch.tones[2], ch.tones[3]].forEach(function (n) { padNote(mtof(n - 12), t, bar, .016); });   // warm pad
+      for (var k = 0; k < 8; k++) {                            // eighth-note arpeggio
+        var n = ch.tones[PATTERN[k] % ch.tones.length], hum = (Math.random() - .5) * .02;
+        pluck(mtof(n), t + k * BEAT / 2 + hum, (k % 4 === 0 ? .05 : .034) * v, 2.2);
+      }
+      if (barIdx % 2 === 1) {                                  // slow melody every other bar
+        var m = MELODY[(barIdx >> 1) % MELODY.length];
+        pluck(mtof(ch.tones[m[0]] + 12), t + BEAT * .5, .05, 3.2);
+        pluck(mtof(ch.tones[m[1]] + 12), t + BEAT * 2.5, .045, 3.6);
+      }
+      if (Math.random() < .5) pluck(mtof(ch.tones[5] + 24), t + BEAT * 3.5, .018, 2.4);   // little shimmer
+      barIdx++;
+    }
+    function startSynth() {
+      if (synthOn || !ctx) return; synthOn = true;
+      musicBus = ctx.createGain(); musicBus.gain.value = .75; musicBus.connect(master);
+      nextBar = ctx.currentTime + .15;
+      (function tick() {
+        if (ctx && nextBar < ctx.currentTime + 1.2) { scheduleBar(nextBar); nextBar += BEAT * 4; }
+        setTimeout(tick, 250);
+      })();
+    }
+
     return {
       /* Background music is YOUR track: put a file at CONFIG.music (default music/song.mp3). */
       start: function () {
@@ -96,8 +151,9 @@
         if (started) return; started = true;
         if (CONFIG.music) {
           bgm = new Audio(CONFIG.music); bgm.loop = true; bgm.volume = .8; bgm.muted = !enabled;
-          var p = bgm.play(); if (p && p.catch) p.catch(function () {});
-        }
+          bgm.addEventListener('error', startSynth);
+          var p = bgm.play(); if (p && p.catch) p.catch(function () { startSynth(); });
+        } else startSynth();
       },
       toggle: function () {
         enabled = !enabled;
@@ -115,7 +171,8 @@
         var t = ctx.currentTime;
         PENTA.forEach(function (f, i) { box(f, t + i * .07, .06, 1.4); });
       },
-      birthday: function () { this.arpeggio(); return 0; }
+      birthday: function () { this.arpeggio(); return 0; },
+      _notes: function () { return notes; }
     };
   })();
   MAGIC.sound = Sound;
