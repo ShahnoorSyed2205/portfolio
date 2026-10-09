@@ -105,8 +105,8 @@
   /* ---------- sky (gradient that shifts with scroll) ---------- */
   var PAL = [
     { top: 0x0b0620, mid: 0x2a1250, bot: 0x5b2a6b },
-    { top: 0x140a30, mid: 0x4a1f63, bot: 0xa5507c },
-    { top: 0x2a1240, mid: 0x93456e, bot: 0xf4b072 }
+    { top: 0x1a0c38, mid: 0x55226a, bot: 0xc2608c },
+    { top: 0x30164a, mid: 0xa84e78, bot: 0xffb88c }
   ];
   var skyU = { uTop: { value: new T.Color() }, uMid: { value: new T.Color() }, uBot: { value: new T.Color() } };
   var sky = new T.Mesh(new T.SphereGeometry(300, 24, 16), new T.ShaderMaterial({
@@ -179,10 +179,11 @@
       g.beginPath(); g.arc(c[0] * w, c[1] * w, c[2], 0, 7); g.fillStyle = 'rgba(190,150,90,.16)'; g.fill();
     });
   }, 0);
-  var moon = new T.Sprite(new T.SpriteMaterial({ map: moonTex, fog: false, transparent: true, toneMapped: false, color: 0xf2e4c2 }));
+  var moon = new T.Sprite(new T.SpriteMaterial({ map: moonTex, fog: false, transparent: true, toneMapped: false, color: 0xb9ad8e }));
   moon.scale.set(24, 24, 1);
-  var moonGlow = new T.Sprite(new T.SpriteMaterial({ map: glowTex, color: 0xffd98a, blending: T.AdditiveBlending, depthWrite: false, fog: false, transparent: true, opacity: .55, toneMapped: false }));
+  var moonGlow = new T.Sprite(new T.SpriteMaterial({ map: glowTex, color: 0xffd98a, blending: T.AdditiveBlending, depthWrite: false, fog: false, transparent: true, opacity: .4, toneMapped: false }));
   moonGlow.scale.set(110, 110, 1);
+  moonGlow.renderOrder = 1; moon.renderOrder = 2; moon.material.depthTest = false; moonGlow.material.depthTest = false;
   moonGroup.add(moonGlow, moon);
   moonGroup.position.set(-70, 52, -150);
 
@@ -310,6 +311,79 @@
     return g;
   }
 
+  var loader = new T.TextureLoader(), ASSETS = window.ASSETS || {};
+  function makeBillboard(key, h) {
+    var g = new T.Group();
+    var mat = new T.MeshBasicMaterial({ transparent: true, side: T.DoubleSide, toneMapped: false, fog: false, alphaTest: .02, opacity: 0 });
+    var mesh = new T.Mesh(new T.PlaneGeometry(1, 1), mat); mesh.scale.set(h, h, 1); g.add(mesh);
+    if (ASSETS[key]) loader.load(ASSETS[key], function (tex) {
+      tex.encoding = T.sRGBEncoding; tex.anisotropy = 4;
+      mat.map = tex; mat.opacity = 1; mat.needsUpdate = true;
+      mesh.scale.set(h * tex.image.width / tex.image.height, h, 1);
+    });
+    g.userData.hitR = h * .62; g.userData.hitY = 0;
+    return g;
+  }
+
+  /* ---- Penguin (Aiman's nickname) in a sunflower beanie ---- */
+  function makePenguin() {
+    var g = new T.Group(), M_ = function (hex) { return crochetMat({ color: hex }); };
+    var ball = function (r, hex, sx, sy, sz, x, y, z) { var m = new T.Mesh(new T.SphereGeometry(r, 28, 20), M_(hex)); m.scale.set(sx, sy, sz); m.position.set(x, y, z); g.add(m); return m; };
+    ball(1, 0x2b2f55, .85, 1, .78, 0, 0, 0);                      // body
+    ball(1, 0xfff3dc, .6, .76, .5, 0, -.12, .42);                  // belly
+    var eyeM = new T.MeshStandardMaterial({ color: 0x0d0d14, roughness: .3 });
+    [-1, 1].forEach(function (d) {
+      var e = new T.Mesh(new T.SphereGeometry(.1, 16, 12), eyeM); e.position.set(d * .27, .33, .7); g.add(e);
+      var h = new T.Mesh(new T.SphereGeometry(.035, 8, 8), new T.MeshBasicMaterial({ color: 0xffffff })); h.position.set(d * .27 + .03, .37, .79); g.add(h);
+      ball(.2, 0xf5a3b5, 1, .7, .3, d * .46, .16, .6);             // blush
+      var w = ball(.2, 0x2b2f55, .9, 2.6, 1.3, d * .86, -.1, 0); w.rotation.z = -d * .35; (g.userData.wings = g.userData.wings || []).push([w, d]);
+      ball(.3, 0xff9a3c, 1, .3, 1.3, d * .3, -.97, .4);              // feet
+    });
+    var beak = new T.Mesh(new T.ConeGeometry(.14, .3, 18), M_(0xff9a3c)); beak.rotation.x = Math.PI / 2; beak.position.set(0, .2, .82); g.add(beak);
+    var cap = new T.Mesh(new T.SphereGeometry(.7, 30, 16, 0, Math.PI * 2, 0, Math.PI / 2), M_(0xffbd00)); cap.scale.set(1.02, .8, .95); cap.position.set(0, .66, .02); g.add(cap);
+    var brim = new T.Mesh(new T.TorusGeometry(.7, .09, 12, 36), M_(0xf0a000)); brim.rotation.x = Math.PI / 2; brim.scale.set(1.02, .95, 1); brim.position.set(0, .66, .02); g.add(brim);
+    ball(.18, 0xfff3dc, 1, 1, 1, 0, 1.28, 0);                      // pom-pom
+    var pin = makeSunflower({ n: 12 }); pin.scale.setScalar(.22); pin.position.set(.36, .98, .5); pin.rotation.y = .4; g.add(pin);
+    g.userData.hitR = 1.5; g.userData.hitY = .1;
+    return g;
+  }
+
+  /* ---- Tiny stitched treasure: amigurumi keychain in a little brown hat ---- */
+  function makeAmigurumi() {
+    var g = new T.Group();
+    var geo = new T.CapsuleGeometry(.5, .6, 10, 28), pos = geo.attributes.position, cols = new Float32Array(pos.count * 3), c = new T.Color();
+    for (var i = 0; i < pos.count; i++) { var y = pos.getY(i); c.setHex(y > .36 || y < -.1 ? 0xd08a35 : 0xffe9c4); cols.set([c.r, c.g, c.b], i * 3); }
+    geo.setAttribute('color', new T.BufferAttribute(cols, 3));
+    g.add(new T.Mesh(geo, crochetMat({ vertexColors: true, emissive: 0x4a2a0a, emissiveIntensity: .35 })));
+    var brown = crochetMat({ color: 0x5a3315 });
+    var dome = new T.Mesh(new T.SphereGeometry(.52, 28, 14, 0, Math.PI * 2, 0, Math.PI / 2), brown); dome.scale.set(1, .62, 1); dome.position.y = .74; g.add(dome);
+    var brim = new T.Mesh(new T.CylinderGeometry(.7, .7, .08, 36), brown); brim.position.y = .75; g.add(brim);
+    var dark = new T.MeshStandardMaterial({ color: 0x120a08, roughness: .4 });
+    [-1, 1].forEach(function (d) {
+      var e = new T.Mesh(new T.SphereGeometry(.06, 12, 10), dark); e.position.set(d * .19, .2, .47); g.add(e);
+      var b = new T.Mesh(new T.SphereGeometry(.1, 12, 8), new T.MeshStandardMaterial({ color: 0xf5a3b5, roughness: 1 })); b.scale.set(1, .6, .4); b.position.set(d * .31, .08, .44); g.add(b);
+    });
+    var smile = new T.Mesh(new T.TorusGeometry(.11, .02, 8, 18, Math.PI), dark); smile.rotation.z = Math.PI; smile.position.set(0, .12, .49); g.add(smile);
+    var metal = new T.MeshStandardMaterial({ color: C.metal, metalness: 1, roughness: .28 });
+    var ring = new T.Mesh(new T.TorusGeometry(.24, .035, 12, 36), metal); ring.position.set(0, 1.2, 0); g.add(ring);
+    var clasp = new T.Mesh(new T.TorusGeometry(.08, .025, 8, 16), metal); clasp.position.set(0, .98, 0); clasp.scale.y = 1.4; g.add(clasp);
+    g.userData.hitR = 1.4; g.userData.hitY = .2;
+    return g;
+  }
+
+  /* ---- Sunflower hair tie on a green stick (her signature) ---- */
+  function makeScrunchie() {
+    var g = new T.Group();
+    var back = petalRing(PETAL_A, 22, .6, -.05, .12, 0xf0a000, 0), front = petalRing(PETAL_B, 22, .58, .04, .02, 0xffbd00, Math.PI / 22);
+    var ring = new T.Mesh(new T.TorusGeometry(.5, .17, 14, 44), crochetMat({ color: 0x1b1b1f })); ring.position.z = .06;
+    var stick = new T.Mesh(new T.CylinderGeometry(.045, .045, 3.6, 12), new T.MeshStandardMaterial({ color: 0x3c7a2c, roughness: .7 })); stick.rotation.z = Math.PI / 2; stick.position.z = .05;
+    var l1 = leaf(0x5f9a4a); l1.scale.multiplyScalar(.5); l1.position.set(1.35, -.22, .05); l1.rotation.z = .3;
+    var mini = makeSunflower({ n: 12 }); mini.scale.setScalar(.3); mini.position.set(1.85, .02, .05);
+    g.add(back, front, ring, stick, l1, mini);
+    g.userData.hitR = 1.7; g.userData.hitY = 0;
+    return g;
+  }
+
   function makeYarn(hex) {
     var g = new T.Group();
     var ball = new T.Mesh(new T.SphereGeometry(.85, 40, 28), new T.MeshStandardMaterial({ map: yarnTex, bumpMap: yarnTex, bumpScale: 2.2, color: hex, roughness: .95 }));
@@ -340,22 +414,25 @@
   var LAYOUT = [
     ['key',  0.00,  .93, -1,  1.6],
     ['sun',  0.085, -.78, 0,  1.6],
-    ['yarn', 0.17,  .8,  0,   1.35],
+    ['pen',  0.17,  .8,  0,   1.3],
     ['key',  0.27, -.74, -1,  1.5],
     ['sun',  0.38,  .76, 0,   1.7],
-    ['yarn', 0.50, -.8,  0,   1.3],
+    ['ami',  0.50, -.8,  0,   1.5],
     ['key',  0.62,  .72, -1,  1.5],
-    ['sun',  0.76, -.74, 0,   1.8],
-    ['key',  0.92,  .7,  0,   1.7]
+    ['scr',  0.76, -.74, 0,   1.45],
+    ['key',  0.92,  .7,  0,   1.7],
+    ['bb',   0.40,  .93,  1,  1, 'charlie', 5.4],
+    ['bb',   0.64, -.9,  1,  1, 'girlYarn', 3.6],
+    ['bb',   0.9,  -.9,  1,  1, 'girlKnit', 3.4]
   ];
   var DECOR = []; // filler, deeper
   for (var d = 0; d < (small ? 14 : 26); d++) {
-    DECOR.push([['sun', 'yarn', 'key'][d % 3], d / (small ? 14 : 26) + rand(-.02, .02), (d % 2 ? 1 : -1) * rand(.35, 1.3), rand(-13, -6), rand(.5, .95)]);
+    DECOR.push([['sun', 'yarn', 'key'][d % 3], d / (small ? 14 : 26) + rand(-.02, .02), (d % 2 ? 1 : -1) * rand(.74, 1.3), rand(-13, -6), rand(.5, .95)]);
   }
 
   function build() {
     LAYOUT.forEach(function (L, idx) {
-      var obj = L[0] === 'sun' ? makeSunflower({ n: 18 }) : L[0] === 'key' ? makeKeychain() : makeYarn(YARN_COLS[idx % YARN_COLS.length]);
+      var obj = L[0] === 'bb' ? makeBillboard(L[5], L[6]) : L[0] === 'pen' ? makePenguin() : L[0] === 'ami' ? makeAmigurumi() : L[0] === 'scr' ? makeScrunchie() : L[0] === 'sun' ? makeSunflower({ n: 18 }) : L[0] === 'key' ? makeKeychain() : makeYarn(YARN_COLS[idx % YARN_COLS.length]);
       var it = { obj: obj, type: L[0], p: L[1], nx: L[2], z: L[3], s: L[4], dy: 0, phase: Math.random() * 6.28, id: idx, hover: 0, spin: 0, pick: true, base: L[4] };
       if (idx === 0) { hero = it; }
       if (L[0] === 'key') obj.position.y = 0;
@@ -376,7 +453,7 @@
       var dist = 14 - it.z;
       var halfW = Math.tan(T.MathUtils.degToRad(camera.fov / 2)) * dist * camera.aspect;
       var nx = it.nx, dy = 0, s = it.base;
-      if (camera.aspect < 1) { nx = (it.nx < 0 ? -1 : 1) * 1.08; s = it.base * (it === hero ? .5 : .46); }
+      if (camera.aspect < 1) { nx = (it.nx < 0 ? -1 : 1) * 1.08; s = it.base * (it === hero ? .5 : it.type === 'bb' ? .58 : .46); }
       it.s = s; it.dy = dy;
       it.x = nx * halfW * (camera.aspect < 1 ? .92 : .82);
       it.y = -it.p * WORLD_H + dy;
@@ -404,7 +481,7 @@
   var ray = new T.Raycaster(), ndc = new T.Vector2(), mouse = { x: 0, y: 0 }, hovered = null;
   var hintEl = document.getElementById('hint');
   var htmlEl = document.documentElement;
-  var INTERACTIVE = 'a,button,.card,.frame,.paper,.lightbox,.toast,.hud,.wishes-hud,input';
+  var INTERACTIVE = 'a,button,.sticker,.gate-charlie,.card,.frame,.paper,.lightbox,.toast,.hud,.wishes-hud,input';
 
   function pick(cx, cy) {
     ndc.set((cx / innerWidth) * 2 - 1, -(cy / innerHeight) * 2 + 1);
@@ -529,6 +606,7 @@
     var z = lerp(24, 14, ease) + Math.sin(t * .25) * .15;
     camera.position.set(camMx * 1.1 + Math.sin(t * .15) * .3, camY - camMy * .7 + Math.sin(t * .2) * .15, z);
     camera.lookAt(camMx * .4, camY - camMy * .25 - .2, 0);
+    if (window.__cam) { camera.position.copy(window.__cam.p); camera.lookAt(window.__cam.l); }
     camBase.z = z;
     glowLight.position.set(camera.position.x + 3, camera.position.y + 2, 9);
 
@@ -554,6 +632,21 @@
         o.rotation.y = Math.sin(t * .4 + it.phase) * .5 + it.spinAcc;
         o.rotation.x = Math.sin(t * .33 + it.phase) * .18;
         o.rotation.z = t * .12 * (it.phase > 3 ? 1 : -1);
+      } else if (it.type === 'pen') {
+        var hop = Math.abs(Math.sin(t * 1.3 + it.phase));
+        o.position.y = it.y + hop * .35;
+        o.rotation.y = Math.sin(t * .5 + it.phase) * .5 + it.spinAcc;
+        o.rotation.z = Math.sin(t * 2.6 + it.phase) * .06;
+        (o.userData.wings || []).forEach(function (w) { w[0].rotation.z = -w[1] * (.35 + Math.sin(t * 5 + it.phase) * .22 * hop); });
+      } else if (it.type === 'ami') {
+        o.rotation.y = Math.sin(t * .6 + it.phase) * .6 + it.spinAcc;
+        o.rotation.z = Math.sin(t * .9 + it.phase) * .12;
+      } else if (it.type === 'scr') {
+        o.rotation.z = t * .18 + it.phase;
+        o.rotation.y = Math.sin(t * .4 + it.phase) * .45 + it.spinAcc;
+      } else if (it.type === 'bb') {
+        o.rotation.y = Math.sin(t * .6 + it.phase) * .4 + it.spinAcc;
+        o.rotation.z = Math.sin(t * .8 + it.phase) * .05;
       } else {
         o.rotation.y = t * .25 + it.phase + it.spinAcc;
         o.rotation.z = Math.sin(t * .5 + it.phase) * .2;
@@ -575,6 +668,7 @@
     updateParticles(dt);
     renderer.render(scene, camera);
   }
+  if (location.hash === '#debug') window.__magic = { items: items, THREE: T };
   // render once so the page isn't blank before the loop starts
   renderer.render(scene, camera);
   frame();

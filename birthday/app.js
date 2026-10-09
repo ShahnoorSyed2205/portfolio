@@ -7,17 +7,29 @@
 
   var CONFIG = {
     name: 'Aiman',          // her name, shown across the page
-    from: 'Shahnoor',       // sign-off on the letter
-    wishes: [               // 9 wishes hidden in the 3D world (one per floating object)
+    from: 'Syeda, your Charlie', // sign-off on the letter
+    music: 'music/song.mp3', // YOUR track (drop the file in birthday/music/). Leave '' for no music.
+    work: [                 // Aim to Crochet photos: drop files in img/work/ (missing ones are skipped)
+      ['sunflower-hairtie.jpg', 'The sunflower hair tie. Her signature.'],
+      ['sunflower-bag.jpg', 'A sunflower purse, stitched by hand.'],
+      ['sunflower-band.jpg', 'Sunflower wristbands for sunny days.'],
+      ['tiny-treasures.jpg', 'Tiny stitched treasures. Always here to smile.'],
+      ['cherry-bag.jpg', 'Cherries on top.'],
+      ['star-dish.jpg', 'Star dishes for little treasures.']
+    ],
+    wishes: [               // 12 wishes hidden in the 3D world (one per floating object)
       'May every door you knock on open before you finish knocking.',
       'Soft mornings, loud laughter, and a heart that stays light.',
-      'May your hook never tangle and your yarn never run out.',
+      'Waddle into this year, my Penguin. It was made for you.',
       'May the people who love you show up in ways you can actually feel.',
       'Every dream you have stitched in secret: may it bloom this year.',
-      'May your sunflowers always find the sun, and so may you.',
+      'Tiny stitched treasures, big beautiful life. May all of it come true.',
       'You turn thread into joy. Never stop. The world needs it.',
-      'May this year be gentler to you than you are to yourself.',
-      'Everything good that you give out: may it come back doubled.'
+      'May your sunflowers always find the sun, and so may you.',
+      'Everything good that you give out: may it come back doubled.',
+      'Charlie tips the hat: you are my favourite audience, and my favourite person.',
+      'May your hook never tangle and your tea stay hot.',
+      'Stitch by stitch, may everything you make stay as soft as your heart.'
     ]
   };
 
@@ -43,10 +55,8 @@
      AUDIO — synthesised, no files. Music-box chimes + soft pad.
      ============================================================ */
   var Sound = (function () {
-    var ctx, master, wet, padTimer, sparkTimer, enabled = true, started = false;
+    var ctx, master, wet, enabled = true, started = false, bgm = null;
     var PENTA = [523.25, 587.33, 659.25, 783.99, 880, 1046.5, 1174.66];
-    var PADS = [[220, 277.18, 329.63], [174.61, 220, 261.63], [261.63, 329.63, 392], [196, 246.94, 293.66]];
-    var padIdx = 0;
 
     function init() {
       if (ctx) return;
@@ -54,92 +64,58 @@
       if (!AC) return;
       ctx = new AC();
       master = ctx.createGain(); master.gain.value = .9; master.connect(ctx.destination);
-      // cheap reverb: decaying noise impulse
-      var len = ctx.sampleRate * 2.4, buf = ctx.createBuffer(2, len, ctx.sampleRate);
+      var len = ctx.sampleRate * 2, buf = ctx.createBuffer(2, len, ctx.sampleRate);
       for (var c = 0; c < 2; c++) {
         var d = buf.getChannelData(c);
         for (var i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, 2.6);
       }
       var conv = ctx.createConvolver(); conv.buffer = buf;
-      wet = ctx.createGain(); wet.gain.value = .45;
+      wet = ctx.createGain(); wet.gain.value = .4;
       conv.connect(wet); wet.connect(master);
       master.reverb = conv;
     }
 
-    function tone(freq, t, dur, vol, type, attack) {
+    function tone(freq, t, dur, vol, type) {
       var o = ctx.createOscillator(), g = ctx.createGain();
       o.type = type || 'sine'; o.frequency.value = freq;
       g.gain.setValueAtTime(0.0001, t);
-      g.gain.linearRampToValueAtTime(vol, t + (attack || .005));
+      g.gain.linearRampToValueAtTime(vol, t + .005);
       g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
       o.connect(g); g.connect(master); g.connect(master.reverb);
       o.start(t); o.stop(t + dur + .05);
     }
-
-    function box(freq, t, vol, dur) { // music-box pluck
-      tone(freq, t, dur || 1.4, vol, 'sine');
-      tone(freq * 2, t, (dur || 1.4) * .5, vol * .35, 'sine');
-      tone(freq * 3.01, t, .25, vol * .12, 'triangle');
-    }
-
-    function pad() {
-      if (!ctx || !enabled) return;
-      var t = ctx.currentTime, chord = PADS[padIdx++ % PADS.length];
-      chord.forEach(function (f, i) {
-        [-4, 4].forEach(function (det) {
-          var o = ctx.createOscillator(), g = ctx.createGain();
-          o.type = 'sine'; o.frequency.value = f; o.detune.value = det;
-          g.gain.setValueAtTime(0.0001, t);
-          g.gain.linearRampToValueAtTime(.022, t + 2.4 + i * .2);
-          g.gain.linearRampToValueAtTime(0.0001, t + 7.4);
-          o.connect(g); g.connect(master); g.connect(master.reverb);
-          o.start(t); o.stop(t + 7.6);
-        });
-      });
-    }
-
-    function sparkleLoop() {
-      if (!ctx || !enabled) return;
-      var f = PENTA[Math.floor(Math.random() * PENTA.length)] * (Math.random() < .3 ? 2 : 1);
-      box(f, ctx.currentTime, .028, 2);
+    function box(freq, t, vol, dur) { // tiny music-box tick: UI sound effect only
+      tone(freq, t, dur || 1.2, vol, 'sine');
+      tone(freq * 2, t, (dur || 1.2) * .5, vol * .3, 'sine');
     }
 
     return {
+      /* Background music is YOUR track: put a file at CONFIG.music (default music/song.mp3). */
       start: function () {
-        init(); if (!ctx) return;
-        if (ctx.state === 'suspended') ctx.resume();
+        init(); if (ctx && ctx.state === 'suspended') ctx.resume();
         if (started) return; started = true;
-        pad(); padTimer = setInterval(pad, 6000);
-        sparkTimer = setInterval(function () { if (Math.random() < .75) sparkleLoop(); }, 1900);
+        if (CONFIG.music) {
+          bgm = new Audio(CONFIG.music); bgm.loop = true; bgm.volume = .8; bgm.muted = !enabled;
+          var p = bgm.play(); if (p && p.catch) p.catch(function () {});
+        }
       },
       toggle: function () {
         enabled = !enabled;
-        if (ctx) master.gain.setTargetAtTime(enabled ? .9 : 0, ctx.currentTime, .15);
-        if (enabled && ctx && ctx.state === 'suspended') ctx.resume();
+        if (bgm) bgm.muted = !enabled;
+        if (ctx) master.gain.setTargetAtTime(enabled ? .9 : 0, ctx.currentTime, .1);
         return enabled;
       },
       isOn: function () { return enabled; },
       chime: function (i) {
         if (!ctx || !enabled) return;
-        var f = PENTA[(i == null ? Math.floor(Math.random() * PENTA.length) : i) % PENTA.length];
-        box(f, ctx.currentTime, .09, 1.6);
+        box(PENTA[(i == null ? Math.floor(Math.random() * PENTA.length) : i) % PENTA.length], ctx.currentTime, .07, 1.2);
       },
       arpeggio: function () {
         if (!ctx || !enabled) return;
         var t = ctx.currentTime;
-        PENTA.forEach(function (f, i) { box(f, t + i * .07, .08, 1.8); });
+        PENTA.forEach(function (f, i) { box(f, t + i * .07, .06, 1.4); });
       },
-      birthday: function () {
-        if (!ctx || !enabled) return;
-        var N = { G4: 392, A4: 440, B4: 493.88, C5: 523.25, D5: 587.33, E5: 659.25, F5: 698.46, G5: 783.99 };
-        var song = [['G4', .75], ['G4', .25], ['A4', 1], ['G4', 1], ['C5', 1], ['B4', 2],
-          ['G4', .75], ['G4', .25], ['A4', 1], ['G4', 1], ['D5', 1], ['C5', 2],
-          ['G4', .75], ['G4', .25], ['G5', 1], ['E5', 1], ['C5', 1], ['B4', 1], ['A4', 1],
-          ['F5', .75], ['F5', .25], ['E5', 1], ['C5', 1], ['D5', 1], ['C5', 2.5]];
-        var t = ctx.currentTime + .25, beat = .46;
-        song.forEach(function (n) { box(N[n[0]], t, .12, 1.8); t += n[1] * beat; });
-        return t - ctx.currentTime;
-      }
+      birthday: function () { this.arpeggio(); return 0; }
     };
   })();
   MAGIC.sound = Sound;
@@ -223,8 +199,8 @@
   /* ============================================================
      TILT CARDS (pointer devices)
      ============================================================ */
-  if (!reduce && window.matchMedia('(hover:hover)').matches) {
-    $$('.tilt').forEach(function (el) {
+  function tiltify(el) {
+    {
       el.addEventListener('pointermove', function (e) {
         var r = el.getBoundingClientRect(), px = (e.clientX - r.left) / r.width, py = (e.clientY - r.top) / r.height;
         el.classList.add('live');
@@ -237,8 +213,61 @@
         el.classList.remove('live');
         el.style.setProperty('--rx', '0deg'); el.style.setProperty('--ry', '0deg');
       });
-    });
+    }
   }
+  if (!reduce && window.matchMedia('(hover:hover)').matches) $$('.tilt,.stilt').forEach(tiltify);
+
+  /* ============================================================
+     STICKERS (Charlie + crochet girls): click = bow + new line
+     ============================================================ */
+  $$('.sticker').forEach(function (st) {
+    var lines = (st.dataset.lines || '').split('|').filter(Boolean), i = 0, bubble = $('.bubble', st), fl = $('.float', st);
+    st.addEventListener('click', function (e) {
+      if (lines.length) { i = (i + 1) % lines.length; bubble.textContent = lines[i]; }
+      bubble.classList.remove('pop'); void bubble.offsetWidth; bubble.classList.add('pop');
+      fl.classList.remove('bow'); void fl.offsetWidth; fl.classList.add('bow');
+      Sound.chime(); MAGIC.sparkle(e.clientX, e.clientY, 36);
+    });
+  });
+  var gc = $('.gate-charlie');
+  if (gc) gc.addEventListener('click', function (e) { Sound.chime(); MAGIC.sparkle(e.clientX, e.clientY, 30); });
+
+  /* cute rising confetti: hearts, flowers, sparkles */
+  (function () {
+    if (reduce) return;
+    var box = document.createElement('div'); box.className = 'floaties'; box.setAttribute('aria-hidden', 'true');
+    var G = ['♡', '✿', '✦', '❀', '♡', '✧'], COL = ['#f3a8b8', '#ffc61a', '#f6e0a8', '#b9a2e0', '#ffffff'];
+    for (var k = 0; k < 16; k++) {
+      var s = document.createElement('span');
+      s.textContent = G[k % G.length];
+      s.style.cssText = '--x:' + (Math.random() * 100).toFixed(1) + '%;--s:' + (12 + Math.random() * 16).toFixed(0) + 'px;--c:' + COL[k % COL.length] +
+        ';--d:' + (16 + Math.random() * 14).toFixed(1) + 's;--dl:' + (-Math.random() * 26).toFixed(1) + 's;--sw:' + ((Math.random() * 60 - 30)).toFixed(0) + 'px';
+      box.appendChild(s);
+    }
+    document.body.appendChild(box);
+  })();
+
+  /* ============================================================
+     AIM TO CROCHET showcase: real photos from img/work/ (skipped if absent)
+     ============================================================ */
+  (function () {
+    var grid = $('#workGrid'); if (!grid) return;
+    CONFIG.work.forEach(function (w, n) {
+      var im = new Image();
+      im.onload = function () {
+        var fig = document.createElement('figure');
+        fig.className = 'work stilt reveal in'; fig.style.setProperty('--r', ((n % 2 ? 1 : -1) * (1.5 + (n % 3))) + 'deg');
+        fig.innerHTML = '<i class="tape"></i><figcaption class="script"></figcaption><span class="bubble"></span>';
+        fig.insertBefore(im, fig.firstChild);
+        $('figcaption', fig).textContent = w[1].split('.')[0].replace(/^The /, '');
+        $('.bubble', fig).textContent = w[1];
+        fig.addEventListener('click', function (e) { Sound.chime(); MAGIC.sparkle(e.clientX, e.clientY, 40); });
+        grid.appendChild(fig); grid.hidden = false;
+        if (!reduce && window.matchMedia('(hover:hover)').matches) tiltify(fig);
+      };
+      im.alt = w[1]; im.src = 'img/work/' + w[0];
+    });
+  })();
 
   /* ============================================================
      BUTTON SPARKLES
