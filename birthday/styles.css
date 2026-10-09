@@ -412,3 +412,28 @@ body.locked .hero .reveal{opacity:0}
 @media (max-width:860px){.foot{padding-top:7vh}.end-title{font-size:clamp(2.3rem,12vw,3.6rem)}.foot .lead{font-size:1.1rem}.foot .row{margin-top:1.2rem}}
 
 .wordmark .logo-mark{animation:none;width:.95em;height:.95em;filter:drop-shadow(0 6px 14px rgba(0,0,0,.35));-webkit-text-fill-color:initial;transform-origin:50% 90%;animation:bow 4s ease-in-out infinite}
+
+/* ---- cute "us" frame ---- */
+.usframe{position:absolute;right:0;bottom:0;z-index:3;margin:0;width:clamp(190px,26vw,290px);text-align:center}
+.usframe .blob{position:relative;padding:12px;background:linear-gradient(145deg,#ffe3ea,#f9cfe0 55%,#e9d4ff);
+  border-radius:46% 54% 50% 50% / 42% 44% 56% 58%;box-shadow:0 30px 60px rgba(6,2,16,.5),0 0 50px rgba(243,168,184,.25);transition:border-radius 1.2s var(--ease)}
+.usframe:hover .blob{border-radius:54% 46% 44% 56% / 52% 40% 60% 48%}
+.usframe .blob::after{content:"";position:absolute;inset:6px;border:2.5px dashed rgba(255,255,255,.95);border-radius:inherit;pointer-events:none}
+.usframe img{width:100%;aspect-ratio:4/5;object-fit:cover;object-position:60% 40%;border-radius:inherit;display:block}
+.usframe figcaption{font-size:2rem;line-height:1;color:var(--blush);margin-top:10px;text-shadow:0 2px 14px rgba(10,4,24,.8)}
+.usframe .tag{position:absolute;left:-14px;top:8%;transform:rotate(-8deg);padding:5px 12px;border-radius:8px;font-family:var(--bub);font-size:.78rem;font-weight:500;
+  color:#7a2c4a;background:repeating-linear-gradient(90deg,#ffd6e3 0 9px,#fff0f5 9px 18px);box-shadow:0 4px 10px rgba(0,0,0,.25)}
+.usframe .bubble{bottom:calc(100% + 4px)}
+.usframe:hover .bubble,.usframe:focus-visible .bubble{opacity:1;transform:translate(-50%,-4px) scale(1)}
+.orbit{position:absolute;inset:-6%;pointer-events:none;z-index:4}
+.orbit i{position:absolute;left:50%;top:50%;font-style:normal;color:var(--blush);font-size:1.15rem;text-shadow:0 0 12px var(--blush);
+  animation:orbit 9s linear infinite;animation-delay:calc(var(--n) * -1.8s)}
+.orbit i:nth-child(1){--n:0}.orbit i:nth-child(2){--n:1;color:var(--sun)}.orbit i:nth-child(3){--n:2}.orbit i:nth-child(4){--n:3;color:#fff}.orbit i:nth-child(5){--n:4;color:#d9c2ff}
+@keyframes orbit{from{transform:rotate(0) translateX(clamp(105px,15vw,165px)) rotate(0) scale(.9)}50%{transform:rotate(180deg) translateX(clamp(105px,15vw,165px)) rotate(-180deg) scale(1.25)}to{transform:rotate(360deg) translateX(clamp(105px,15vw,165px)) rotate(-360deg) scale(.9)}}
+.paper-pic{position:absolute;right:clamp(14px,4vw,34px);top:-28px;width:92px;height:92px;transform:rotate(8deg);z-index:2}
+.paper-pic img{width:100%;height:100%;object-fit:cover;object-position:62% 38%;border-radius:50%;border:4px solid #fff;box-shadow:0 8px 20px rgba(0,0,0,.3),0 0 0 3px #f3a8b8;display:block}
+.paper-pic span{position:absolute;right:-6px;bottom:-4px;width:30px;height:30px;border-radius:50%;background:#f3a8b8;color:#fff;display:grid;place-items:center;font-size:1rem;box-shadow:0 3px 8px rgba(0,0,0,.25)}
+@media (max-width:860px){.usframe{width:clamp(150px,42vw,200px)}.paper-pic{width:74px;height:74px;top:-22px}@keyframes orbit{from{transform:rotate(0) translateX(100px) rotate(0)}to{transform:rotate(360deg) translateX(100px) rotate(-360deg)}}}
+.polaroid.p1{width:clamp(165px,21vw,236px)}
+.usframe{right:-5%}
+@media (max-width:860px){.usframe{right:0}.polaroid.p1{width:clamp(140px,40vw,190px)}}
