@@ -9,14 +9,16 @@
     name: 'Aiman',          // her name, shown across the page
     from: 'Syeda, your Charlie', // sign-off on the letter
     music: 'music/song.mp3', // optional: your own track. If the file is missing, a soft romantic score plays instead.
-    work: [                 // Aim to Crochet photos: drop files in img/work/ (missing ones are skipped)
+    work: [                 // Aim to Crochet photos in img/work/ (missing ones are skipped)
       ['sunflower-hairtie.jpg', 'The sunflower hair tie. Her signature.'],
       ['sunflower-bag.jpg', 'A sunflower purse, stitched by hand.'],
       ['sunflower-band.jpg', 'Sunflower wristbands for sunny days.'],
-      ['tiny-treasures.jpg', 'Tiny stitched treasures. Always here to smile.'],
+      ['scrunchies.jpg', 'Scrunchies in every mood.'],
       ['cherry-bag.jpg', 'Cherries on top.'],
-      ['star-dish.jpg', 'Star dishes for little treasures.']
+      ['star-dish.jpg', 'Star dishes for little treasures.'],
+      ['purple-pouch.jpg', 'A little pouch with a flower.']
     ],
+
     wishes: [               // 12 wishes hidden in the 3D world (one per floating object)
       'May every door you knock on open before you finish knocking.',
       'Soft mornings, loud laughter, and a heart that stays light.',
