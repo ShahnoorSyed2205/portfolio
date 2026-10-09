@@ -417,6 +417,65 @@
     setTimeout(function () { MAGIC.sparkle(innerWidth / 2, innerHeight / 2, 120); Sound.arpeggio(); }, 900);
   });
 
+
+  /* ============================================================
+     CUSTOM CURSOR: her Aim to Crochet mascot, with ring + trail
+     ============================================================ */
+  (function () {
+    if (!window.matchMedia('(hover:hover) and (pointer:fine)').matches) return;
+    var root = document.documentElement, NS = 'http://www.w3.org/2000/svg';
+    var ring = document.createElement('div'); ring.className = 'cur-ring';
+    var cur = document.createElement('div'); cur.className = 'cur';
+    var svg = document.createElementNS(NS, 'svg'), use = document.createElementNS(NS, 'use');
+    use.setAttribute('href', '#logo'); svg.appendChild(use); svg.setAttribute('aria-hidden', 'true'); cur.appendChild(svg);
+    document.body.appendChild(ring); document.body.appendChild(cur);
+    root.classList.add('has-cursor');
+
+    var HOVER = 'a,button,.sticker,.frame,.work,.card,.usframe,.chips li,.sw,.polaroid,.envelope,.lb-close,[data-tip],input';
+    var tx = innerWidth / 2, ty = innerHeight / 2, x = tx, y = ty, rx = x, ry = y, rot = 0, sc = 1, down = false, over = false, shown = false, lastTrail = 0;
+    var GLYPHS = ['♡', '✿', '✦', '♡', '❀', '✧'], COLS = ['#f3a8b8', '#ffc61a', '#f6e0a8', '#d9c2ff', '#ffffff'];
+
+    addEventListener('pointermove', function (e) {
+      if (e.pointerType === 'touch') return;
+      tx = e.clientX; ty = e.clientY;
+      if (!shown) { shown = true; x = rx = tx; y = ry = ty; cur.classList.add('on'); ring.classList.add('on'); }
+      var t = e.target;
+      over = !!(t.closest && t.closest(HOVER)) || root.classList.contains('hover3d');
+      cur.classList.toggle('is-hover', over); ring.classList.toggle('is-hover', over);
+      var now = performance.now();
+      if (!reduce && now - lastTrail > 55 && Math.hypot(e.movementX || 0, e.movementY || 0) > 2) { lastTrail = now; trail(tx, ty); }
+    }, { passive: true });
+    document.addEventListener('pointerleave', function () { cur.classList.remove('on'); ring.classList.remove('on'); shown = false; });
+    document.addEventListener('pointerdown', function () { down = true; cur.classList.add('down'); ring.classList.add('down'); });
+    addEventListener('pointerup', function (e) {
+      down = false; cur.classList.remove('down'); ring.classList.remove('down');
+      ripple(e.clientX, e.clientY);
+    });
+
+    function trail(px, py) {
+      var s = document.createElement('span'); s.className = 'cur-trail'; s.textContent = GLYPHS[(Math.random() * GLYPHS.length) | 0];
+      s.style.cssText = 'left:' + px + 'px;top:' + py + 'px;color:' + COLS[(Math.random() * COLS.length) | 0] +
+        ';--dx:' + ((Math.random() - .5) * 46).toFixed(0) + 'px;font-size:' + (10 + Math.random() * 12).toFixed(0) + 'px';
+      document.body.appendChild(s); setTimeout(function () { s.remove(); }, 1000);
+    }
+    function ripple(px, py) {
+      if (reduce) return;
+      var r = document.createElement('span'); r.className = 'cur-ripple'; r.style.left = px + 'px'; r.style.top = py + 'px';
+      document.body.appendChild(r); setTimeout(function () { r.remove(); }, 700);
+      for (var k = 0; k < 5; k++) trail(px + (Math.random() - .5) * 20, py + (Math.random() - .5) * 20);
+    }
+
+    (function loop() {
+      requestAnimationFrame(loop);
+      var k = reduce ? 1 : .34, k2 = reduce ? 1 : .14;
+      var vx = tx - x; x += vx * k; y += (ty - y) * k; rx += (tx - rx) * k2; ry += (ty - ry) * k2;
+      rot += (Math.max(-22, Math.min(22, vx * .9)) - rot) * .18;
+      var target = down ? .78 : over ? 1.32 : 1; sc += (target - sc) * .22;
+      cur.style.transform = 'translate3d(' + x.toFixed(1) + 'px,' + y.toFixed(1) + 'px,0) rotate(' + rot.toFixed(1) + 'deg) scale(' + sc.toFixed(3) + ')';
+      ring.style.transform = 'translate3d(' + rx.toFixed(1) + 'px,' + ry.toFixed(1) + 'px,0)';
+    })();
+  })();
+
   // keep anchor links smooth + sparkle on hero CTA
   $$('a[href^="#"]').forEach(function (a) {
     a.addEventListener('click', function (e) {

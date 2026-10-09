@@ -437,3 +437,21 @@ body.locked .hero .reveal{opacity:0}
 .polaroid.p1{width:clamp(165px,21vw,236px)}
 .usframe{right:-5%}
 @media (max-width:860px){.usframe{right:0}.polaroid.p1{width:clamp(140px,40vw,190px)}}
+
+/* ---- custom cursor ---- */
+html.has-cursor,html.has-cursor *{cursor:none!important}
+.cur,.cur-ring{position:fixed;left:0;top:0;pointer-events:none;z-index:99999;opacity:0;transition:opacity .25s;will-change:transform}
+.cur.on,.cur-ring.on{opacity:1}
+.cur{width:44px;height:44px;margin:-22px 0 0 -22px}
+.cur svg{width:100%;height:100%;display:block;filter:drop-shadow(0 4px 8px rgba(0,0,0,.45));transform-origin:50% 100%;transition:filter .3s}
+.cur.is-hover svg{animation:bow .7s ease-in-out infinite;filter:drop-shadow(0 6px 14px rgba(255,198,26,.6))}
+.cur.down svg{transition:transform .12s}
+.cur-ring{width:46px;height:46px;margin:-23px 0 0 -23px;z-index:99998}
+.cur-ring::before{content:"";position:absolute;inset:0;border:2px dashed rgba(246,224,168,.85);border-radius:50%;transition:transform .35s var(--pop),border-color .3s,opacity .3s;animation:spin 8s linear infinite}
+.cur-ring.is-hover::before{transform:scale(1.5);border-color:var(--sun)}
+.cur-ring.down::before{transform:scale(.7);border-color:var(--blush)}
+.cur-trail{position:fixed;z-index:99997;pointer-events:none;transform:translate(-50%,-50%);text-shadow:0 0 10px currentColor;animation:curTrail 1s ease-out forwards}
+@keyframes curTrail{0%{opacity:.9;transform:translate(-50%,-50%) scale(.6)}100%{opacity:0;transform:translate(calc(-50% + var(--dx)),calc(-50% - 52px)) scale(1.15) rotate(25deg)}}
+.cur-ripple{position:fixed;z-index:99996;pointer-events:none;width:18px;height:18px;margin:-9px 0 0 -9px;border-radius:50%;border:2px solid var(--sun);animation:curRipple .7s ease-out forwards}
+@keyframes curRipple{to{transform:scale(4.5);opacity:0;border-color:var(--blush)}}
+@media (prefers-reduced-motion:reduce){.cur.is-hover svg{animation:none}}
