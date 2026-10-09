@@ -873,7 +873,7 @@
     updateParticles(dt);
     renderer.render(scene, camera);
   }
-  if (location.hash === '#debug') window.__magic = { items: items, THREE: T };
+  if (location.hash === '#debug') window.__magic = { items: items, THREE: T, camera: camera };
   // render once so the page isn't blank before the loop starts
   renderer.render(scene, camera);
   frame();
