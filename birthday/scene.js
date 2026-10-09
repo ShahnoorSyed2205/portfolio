@@ -246,7 +246,7 @@
     s.moveTo(0, 0);
     s.bezierCurveTo(wid, len * .1, wid * 1.1, len * .72, 0, len);
     s.bezierCurveTo(-wid * 1.1, len * .72, -wid, len * .1, 0, 0);
-    return new T.ExtrudeGeometry(s, { depth: .05, bevelEnabled: true, bevelThickness: .06, bevelSize: .05, bevelSegments: 3, curveSegments: 10 });
+    return new T.ExtrudeGeometry(s, { depth: .05, bevelEnabled: true, bevelThickness: .06, bevelSize: .05, bevelSegments: 1, curveSegments: 5 });
   }
   var PETAL_A = petalGeo(.27, .95), PETAL_B = petalGeo(.24, .8);
   var crochetMat = function (extra) {
