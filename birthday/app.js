@@ -119,6 +119,7 @@
     };
   })();
   MAGIC.sound = Sound;
+  MAGIC.onBow = function (on) { var el = $('#bowCap'); if (el) el.classList.toggle('show', on); };
 
   /* ============================================================
      GATE + HUD

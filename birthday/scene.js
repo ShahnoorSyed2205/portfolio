@@ -420,7 +420,7 @@
     ['ami',  0.50, -.8,  0,   1.5],
     ['key',  0.62,  .72, -1,  1.5],
     ['scr',  0.76, -.74, 0,   1.45],
-    ['key',  0.92,  .7,  0,   1.7],
+    ['key',  0.9,   .97, -1,  1.6],
     ['bb',   0.40,  .93,  1,  1, 'charlie', 5.4],
     ['bb',   0.64, -.9,  1,  1, 'girlYarn', 3.6],
     ['bb',   0.9,  -.9,  1,  1, 'girlKnit', 3.4]
@@ -506,7 +506,7 @@
     hovered = it;
     if (it) {
       it.hovering = true; htmlEl.classList.add('hover3d');
-      hintEl.textContent = found[it.id] ? '✦ again?' : '✦ a wish is hiding here';
+      hintEl.textContent = it.stage ? '✦ bow again' : found[it.id] ? '✦ again?' : '✦ a wish is hiding here';
       hintEl.style.left = e.clientX + 'px'; hintEl.style.top = e.clientY + 'px'; hintEl.classList.add('on');
     } else { htmlEl.classList.remove('hover3d'); hintEl.classList.remove('on'); }
   }
@@ -531,6 +531,7 @@
     var h = pick(e.clientX, e.clientY);
     if (h) {
       var it = h.object.userData.item;
+      if (it.stage) { M.bow(); burstAt(h.point, 70, 5); if (M.sound) M.sound.arpeggio(); return; }
       it.spin = 14; it.pop = 1;
       burstAt(h.point, 90, 6);
       found[it.id] = true;
@@ -578,6 +579,209 @@
       })(i);
     }
   };
+
+
+  /* ============================================================
+     FINALE: robotic Charlie + two heart-eyed Charlie-bots take a bow
+     (hat swept off, held to the chest, deep respectful bend)
+     ============================================================ */
+  var stage = new T.Group(); world.add(stage);
+  var bots = [], hearts = [], stagePicks = [];
+  var heartTex = canvasTex(128, 128, function (g, w) {
+    g.fillStyle = '#ff6f98'; g.shadowColor = '#ff9ec0'; g.shadowBlur = 14; g.beginPath();
+    g.moveTo(w / 2, w * .82); g.bezierCurveTo(w * .05, w * .5, w * .2, w * .12, w / 2, w * .34);
+    g.bezierCurveTo(w * .8, w * .12, w * .95, w * .5, w / 2, w * .82); g.fill();
+  }, 0);
+  function heartShape(sc) {
+    var sh = new T.Shape();
+    sh.moveTo(0, -.5 * sc); sh.bezierCurveTo(.9 * sc, .1 * sc, .5 * sc, .8 * sc, 0, .35 * sc);
+    sh.bezierCurveTo(-.5 * sc, .8 * sc, -.9 * sc, .1 * sc, 0, -.5 * sc); return sh;
+  }
+  for (var hi = 0; hi < 30; hi++) {
+    var hs = new T.Sprite(new T.SpriteMaterial({ map: heartTex, transparent: true, depthWrite: false, fog: false, toneMapped: false, opacity: 0 }));
+    hs.scale.set(.4, .4, 1); hs.userData = { life: 0 }; scene.add(hs); hearts.push(hs);
+  }
+  function spawnHeart(from) {
+    for (var i = 0; i < hearts.length; i++) if (hearts[i].userData.life <= 0) {
+      var h = hearts[i]; from.getWorldPosition(h.position);
+      h.position.x += rand(-.5, .5); h.position.y += .6; h.position.z += rand(.1, .5);
+      h.userData = { life: 2.4, max: 2.4, vx: rand(-.25, .25), vy: rand(.5, .9), s: rand(.35, .65) }; return;
+    }
+  }
+
+  var Y_AXIS = new T.Vector3(0, 1, 0), _d = new T.Vector3(), _e = new T.Vector3();
+  function seg(mesh, from, to) {
+    _d.subVectors(to, from); var len = _d.length();
+    mesh.position.copy(from).addScaledVector(_d, .5); mesh.scale.set(1, len, 1);
+    mesh.quaternion.setFromUnitVectors(Y_AXIS, _d.normalize());
+  }
+  function solveArm(arm, S, Tg, bend) {   // 2-bone IK in torso space
+    var L1 = arm.L1, L2 = arm.L2, dir = Tg.clone().sub(S), dist = Math.min(dir.length(), L1 + L2 - .002);
+    dir.normalize();
+    var a = (L1 * L1 - L2 * L2 + dist * dist) / (2 * dist), h = Math.sqrt(Math.max(0, L1 * L1 - a * a));
+    var perp = bend.clone().addScaledVector(dir, -bend.dot(dir)).normalize();
+    var E = S.clone().addScaledVector(dir, a).addScaledVector(perp, h), H = S.clone().addScaledVector(dir, dist);
+    seg(arm.upper, S, E); seg(arm.lower, E, H); arm.elbow.position.copy(E); arm.hand.position.copy(H);
+    return H;
+  }
+  function ss(a, b, x) { x = Math.min(1, Math.max(0, (x - a) / (b - a))); return x * x * (3 - 2 * x); }
+
+  function makeBot(kind) {
+    var isC = kind === 'charlie';
+    var root = new T.Group(), torso = new T.Group(); torso.position.y = 1.5; root.add(torso);
+    var suit = new T.MeshStandardMaterial({ color: 0x07070b, roughness: .5, metalness: .05 });
+    var steel = new T.MeshStandardMaterial({ color: 0xb4bed6, roughness: .28, metalness: .85 });
+    var white = new T.MeshStandardMaterial({ color: 0xf3efe8, roughness: .5 });
+    var body = isC ? suit : steel;
+    // legs + shoes
+    [-1, 1].forEach(function (d) {
+      var leg = new T.Mesh(new T.CylinderGeometry(.17, .14, 1.4, 16), isC ? suit : steel); leg.position.set(d * .25, .78, 0); root.add(leg);
+      var knee = new T.Mesh(new T.SphereGeometry(.15, 12, 10), steel); knee.position.set(d * .25, .85, .03); if (isC) root.add(knee);
+      var shoe = new T.Mesh(new T.BoxGeometry(.36, .17, .66), new T.MeshStandardMaterial({ color: isC ? 0x5a3a24 : 0x3b4259, roughness: .5, metalness: isC ? 0 : .5 })); shoe.position.set(d * .25, .09, .12); root.add(shoe);
+    });
+    // torso
+    var tm = new T.Mesh(new T.CylinderGeometry(.5, .44, 1.35, 24), body); tm.scale.z = .66; tm.position.y = .68; torso.add(tm);
+    var hipJ = new T.Mesh(new T.SphereGeometry(.34, 16, 12), steel); hipJ.position.y = .02; hipJ.scale.z = .8; torso.add(hipJ);
+    var shirt = new T.Mesh(new T.BoxGeometry(.3, .5, .05), white); shirt.position.set(0, 1.0, .34); torso.add(shirt);
+    var tie = new T.Mesh(new T.BoxGeometry(.08, .45, .06), new T.MeshStandardMaterial({ color: 0x111116 })); tie.position.set(0, .95, .375); torso.add(tie);
+    var heartLED = new T.Mesh(new T.ExtrudeGeometry(heartShape(.2), { depth: .03, bevelEnabled: false }), new T.MeshBasicMaterial({ color: 0xff5c8a, toneMapped: false }));
+    heartLED.position.set(isC ? -.26 : 0, isC ? .8 : .55, .34); torso.add(heartLED);
+    if (!isC) { var bow = new T.Mesh(new T.BoxGeometry(.3, .1, .06), new T.MeshStandardMaterial({ color: 0x111116 })); bow.position.set(0, 1.2, .32); torso.add(bow); }
+    // head
+    var head = new T.Group(); head.position.set(0, 1.78, .02); torso.add(head);
+    var neck = new T.Mesh(new T.CylinderGeometry(.12, .14, .3, 12), steel); neck.position.set(0, 1.5, 0); torso.add(neck);
+    var eyeBlack = new T.MeshStandardMaterial({ color: 0x0a0a0f, roughness: .3 });
+    if (isC) {
+      var face = new T.Mesh(new T.SphereGeometry(.43, 28, 22), white); face.scale.set(.98, 1.05, .98); head.add(face);
+      [-1, 1].forEach(function (d) {
+        var e = new T.Mesh(new T.SphereGeometry(.07, 12, 10), eyeBlack); e.scale.set(1, 1.3, .5); e.position.set(d * .15, .06, .39); head.add(e);
+        var ring = new T.Mesh(new T.TorusGeometry(.09, .014, 8, 20), new T.MeshBasicMaterial({ color: 0x55e6ff, toneMapped: false })); ring.position.set(d * .15, .06, .385); head.add(ring);
+        var ear = new T.Mesh(new T.CylinderGeometry(.07, .07, .1, 12), steel); ear.rotation.z = Math.PI / 2; ear.position.set(d * .43, 0, 0); head.add(ear);
+        var brow = new T.Mesh(new T.BoxGeometry(.18, .025, .03), eyeBlack); brow.position.set(d * .15, .2, .39); brow.rotation.z = -d * .18; head.add(brow);
+      });
+      var mous = new T.Mesh(new T.BoxGeometry(.2, .055, .05), eyeBlack); mous.position.set(0, -.07, .42); head.add(mous);
+      var smile = new T.Mesh(new T.TorusGeometry(.08, .012, 8, 16, Math.PI), eyeBlack); smile.rotation.z = Math.PI; smile.position.set(0, -.15, .41); head.add(smile);
+      var hair = new T.Mesh(new T.SphereGeometry(.46, 24, 12, 0, Math.PI * 2, 0, Math.PI * .5), eyeBlack); hair.scale.set(1.02, 1.05, 1.02); hair.rotation.x = -.45; hair.position.set(0, .03, -.07); head.add(hair);
+    } else {
+      var hb = new T.Mesh(new T.BoxGeometry(.86, .74, .72), steel); hb.geometry.translate(0, 0, 0); head.add(hb);
+      var visor = new T.Mesh(new T.BoxGeometry(.7, .42, .05), new T.MeshStandardMaterial({ color: 0x0c0f1c, roughness: .2, metalness: .3 })); visor.position.set(0, .04, .365); head.add(visor);
+      head.userData.eyes = [];
+      [-1, 1].forEach(function (d) {
+        var he = new T.Mesh(new T.ExtrudeGeometry(heartShape(.26), { depth: .02, bevelEnabled: false }), new T.MeshBasicMaterial({ color: 0xff5c8a, toneMapped: false }));
+        he.position.set(d * .17, .08, .395); head.add(he); head.userData.eyes.push(he);
+      });
+      var m = new T.Mesh(new T.BoxGeometry(.22, .05, .04), new T.MeshBasicMaterial({ color: 0x1a1a22 })); m.position.set(0, -.1, .395); head.add(m);   // little Charlie moustache
+      var ant = new T.Mesh(new T.CylinderGeometry(.015, .015, .32, 6), steel); ant.position.set(0, .52, 0); head.add(ant);
+      var tip = new T.Mesh(new T.SphereGeometry(.05, 10, 8), new T.MeshBasicMaterial({ color: 0xff5c8a, toneMapped: false })); tip.position.set(0, .7, 0); head.add(tip); head.userData.tip = tip;
+      [-1, 1].forEach(function (d) { var ear = new T.Mesh(new T.CylinderGeometry(.1, .1, .1, 14), steel); ear.rotation.z = Math.PI / 2; ear.position.set(d * .47, 0, 0); head.add(ear); });
+    }
+    // arms (IK-driven)
+    function makeArm() {
+      var mat = isC ? suit : steel;
+      var up = new T.Mesh(new T.CylinderGeometry(.095, .095, 1, 12), mat), lo = new T.Mesh(new T.CylinderGeometry(.085, .085, 1, 12), mat);
+      var el = new T.Mesh(new T.SphereGeometry(.12, 12, 10), steel), ha = new T.Mesh(new T.SphereGeometry(.12, 14, 12), isC ? white : steel);
+      torso.add(up, lo, el, ha);
+      var sh = new T.Mesh(new T.SphereGeometry(.15, 12, 10), steel); torso.add(sh);
+      return { upper: up, lower: lo, elbow: el, hand: ha, shoulder: sh, L1: .7, L2: .72 };
+    }
+    var armR = makeArm(), armL = makeArm();
+    armR.shoulder.position.set(.52, 1.17, 0); armL.shoulder.position.set(-.52, 1.17, 0);
+    // hat
+    var hat = new T.Group();
+    var brown = new T.MeshStandardMaterial({ color: 0x54341c, roughness: .8 });
+    var crown = new T.Mesh(new T.CylinderGeometry(.29, .34, .27, 26), brown); crown.position.y = .14; hat.add(crown);
+    var band = new T.Mesh(new T.CylinderGeometry(.345, .345, .07, 26), new T.MeshStandardMaterial({ color: 0x14141a })); band.position.y = .06; hat.add(band);
+    var brim = new T.Mesh(new T.CylinderGeometry(.58, .58, .035, 36), brown); hat.add(brim);
+    torso.add(hat);
+    // hit proxy for clicks
+    var hit = new T.Mesh(new T.SphereGeometry(2.3, 10, 8), new T.MeshBasicMaterial({ visible: false })); hit.position.y = 2.1;
+    hit.userData.item = { stage: true, id: -1, s: 1, hover: 1 }; root.add(hit); stagePicks.push(hit);
+    var b = { root: root, torso: torso, head: head, hat: hat, armR: armR, armL: armL, isC: isC, heartAcc: 0 };
+    stage.add(root); bots.push(b); return b;
+  }
+  var botL = makeBot('bot'), botC = makeBot('charlie'), botR = makeBot('bot');
+  stagePicks.forEach(function (p) { pickables.push(p); });
+  var stageSpot = new T.PointLight(0xffd8a0, 1.4, 22, 2); scene.add(stageSpot);
+  var stageRing = new T.Mesh(new T.RingGeometry(3.2, 3.3, 64), new T.MeshBasicMaterial({ color: 0xffd98a, transparent: true, opacity: .55, side: T.DoubleSide, toneMapped: false, fog: false }));
+  stageRing.rotation.x = -Math.PI / 2; stageRing.position.y = .02; stage.add(stageRing);
+  var stageGlow = new T.Mesh(new T.CircleGeometry(3.4, 48), new T.MeshBasicMaterial({ map: glowTex, color: 0xffc766, transparent: true, opacity: .55, depthWrite: false, toneMapped: false, fog: false }));
+  stageGlow.rotation.x = -Math.PI / 2; stageGlow.position.y = .01; stage.add(stageGlow);
+
+  var STAGE_T = 8.4, stageTime = -1, stageActive = false, bowing = false;
+  var P_SIDE = new T.Vector3(.62, -.02, .1), L_SIDE = new T.Vector3(-.62, -.02, .1), L_OUT = new T.Vector3(-.95, .55, .35);
+  var HAT_HEAD = new T.Vector3(0, 2.1, .02), HAT_CHEST = new T.Vector3(.0, 1.0, .52);
+  var HAND_HEAD = new T.Vector3(.46, 2.1, .12), HAND_CHEST = new T.Vector3(.4, 1.0, .58);
+  var BEND_R = new T.Vector3(.7, -.55, -.35), BEND_L = new T.Vector3(-.7, -.55, -.35);
+  var tmpT = new T.Vector3(), tmpL = new T.Vector3(), SHR = new T.Vector3(), SHL = new T.Vector3();
+
+  function layoutStage() {
+    var dist = 14 - 1, halfW = Math.tan(T.MathUtils.degToRad(camera.fov / 2)) * dist * camera.aspect;
+    var sc = Math.min(1.45, halfW * (camera.aspect < 1 ? .3 : .4));
+    stage.scale.setScalar(sc);
+    stage.position.set(0, -WORLD_H - 5.75, 1);
+    var sp = 2.0 * sc / sc;                       // spacing in stage units
+    botL.root.position.x = -sp * 1.02; botR.root.position.x = sp * 1.02; botC.root.position.x = 0;
+    botL.root.position.z = botR.root.position.z = -.25;
+    stageSpot.position.set(0, stage.position.y + 5, 7);
+  }
+  layoutStage(); addEventListener('resize', layoutStage);
+
+  function poseBot(b, u, dt) {
+    u = ((u % STAGE_T) + STAGE_T) % STAGE_T;
+    // w: 0 = hat on head, 1 = hat held to the chest
+    var w = ss(1.9, 2.9, u) * (1 - ss(6.0, 6.9, u));
+    var held = u >= 1.9 && u < 6.9;
+    b.hat.position.lerpVectors(HAT_HEAD, HAT_CHEST, w);
+    b.hat.rotation.set(.02 + w * 1.28, 0, -.09 * (1 - w));
+    b.hat.scale.setScalar(1 - .2 * w);
+    var tgt = tmpT;
+    if (u < 1.0) tgt.copy(P_SIDE);
+    else if (u < 1.9) tgt.lerpVectors(P_SIDE, HAND_HEAD, ss(1, 1.9, u));
+    else if (held) tgt.lerpVectors(HAND_HEAD, HAND_CHEST, w);
+    else if (u < 7.7) tgt.lerpVectors(HAND_HEAD, P_SIDE, ss(6.9, 7.7, u));
+    else tgt.copy(P_SIDE);
+    var bend = ss(2.5, 3.9, u) * (1 - ss(5.0, 6.2, u));
+    b.torso.rotation.x = bend * .62;
+    b.head.rotation.x = bend * .3;
+    SHR.copy(b.armR.shoulder.position); SHL.copy(b.armL.shoulder.position);
+    solveArm(b.armR, SHR, tgt, BEND_R);
+    tmpL.lerpVectors(L_SIDE, L_OUT, bend);
+    solveArm(b.armL, SHL, tmpL, BEND_L);
+    if (!b.isC) {
+      var pul = 1 + Math.sin(performance.now() * .008) * .12;
+      b.head.userData.eyes.forEach(function (e) { e.scale.set(pul, pul, 1); });
+      b.head.userData.tip.scale.setScalar(pul);
+    }
+    // hearts while bowing
+    if (bend > .35 && stageActive) { b.heartAcc += dt; if (b.heartAcc > (b.isC ? .9 : .42)) { b.heartAcc = 0; spawnHeart(b.head); } }
+    return bend;
+  }
+
+  function updateStage(dt, t) {
+    var near = scrollS > .9;
+    if (near && !stageActive) { stageActive = true; stageTime = 0; }
+    if (!near && scrollS < .82) { stageActive = false; stageTime = -1; }
+    if (stageActive) stageTime += dt;
+    var u = stageActive ? stageTime : 0;
+    var bw = 0;
+    [[botL, .22], [botC, 0], [botR, .22]].forEach(function (p) {
+      var bend = poseBot(p[0], u - p[1], dt); if (p[0] === botC) bw = bend;
+      // tiny idle sway so they feel alive
+      p[0].root.rotation.y = Math.sin(t * .6 + p[1] * 9) * .05 + (p[0] === botL ? .18 : p[0] === botR ? -.18 : 0);
+      p[0].root.position.y = Math.sin(t * 1.4 + p[1] * 6) * .015;
+    });
+    var nowBowing = bw > .3;
+    if (nowBowing !== bowing) { bowing = nowBowing; if (M.onBow) M.onBow(bowing); if (bowing && M.sound) M.sound.chime(2); }
+    stageRing.rotation.z = t * .1;
+    for (var i = 0; i < hearts.length; i++) {
+      var h = hearts[i], d = h.userData; if (d.life <= 0) continue;
+      d.life -= dt; var k = Math.max(0, d.life / d.max);
+      h.position.x += d.vx * dt; h.position.y += d.vy * dt; h.material.opacity = Math.min(1, k * 2.2);
+      var s2 = d.s * (1.2 - k * .4); h.scale.set(s2, s2, 1);
+      if (d.life <= 0) h.material.opacity = 0;
+    }
+  }
+  M.bow = function () { if (stageActive) stageTime = 1.0; };
 
   /* ============================================================
      LOOP
@@ -665,6 +869,7 @@
       }
     }
 
+    updateStage(dt, t);
     updateParticles(dt);
     renderer.render(scene, camera);
   }
