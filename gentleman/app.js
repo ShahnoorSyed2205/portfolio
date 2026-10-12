@@ -26,7 +26,7 @@
       { name: 'BMW', line: 'Precision, presence and a quiet kind of power.', chips: ['Sport coupé', 'Twin-turbo', 'Pure poise'] },
       { photo: 'img/cars/hilux.jpg', name: 'Toyota Hilux', line: 'The latest model. Built to carry whatever life puts on it.', chips: ['Latest model', '4×4', 'Unstoppable'] },
       { photo: 'img/cars/civic.jpg', name: 'Honda Civic RS', line: 'Sharp, quick and honest, just like the man who drives it.', chips: ['RS', 'Turbo', 'Daily thrill'] },
-      { name: 'The Collector\'s Classic', line: 'For the billionaire in him: a vintage beauty that only improves with age.', chips: ['Vintage', 'Hand-built', 'Timeless'] },
+      { photo: 'img/cars/antique.jpg', name: 'The Collector\'s Classic', line: 'For the billionaire in him: a vintage beauty that only improves with age.', chips: ['Vintage', 'Hand-built', 'Timeless'] },
       { name: 'F-22 Raptor', line: 'The sky is not the limit. For a pilot at heart, it is home.', chips: ['Air dominance', 'Stealth', 'Pilot at heart'] }
     ],
     portraits: [             // [file in img/his/, title, hover line, wide?]
@@ -35,6 +35,12 @@
       ['night.jpg', 'Quiet confidence', 'no words needed'],
       ['watch.jpg', 'Time well kept', 'elegance, down to the wrist'],
       ['levis.jpg', 'Always composed', 'calm in every room']
+    ],
+    icons: [
+      ['icons/mustang.jpg', 'Fastback', 'steel, sunlight and a V8 hum'],
+      ['icons/cobra.jpg', 'The Cobra', 'raw, red and unapologetic', true],
+      ['icons/lighter.jpg', 'Gold, lit', 'a flame worth the wait'],
+      ['icons/goldleaf.jpg', 'Gold Leaf', 'his small ritual']
     ],
     extra: [
       ['armoury/rifles.jpg', 'The rifles', 'a collector\'s eye', true],
@@ -279,6 +285,7 @@
     img.src = src;
   }
   CONFIG.portraits.forEach(function (p) { frame('img/his/', p, $('#gallery')); });
+  CONFIG.icons.forEach(function (p) { frame('img/', p, $('#iconGrid')); });
   CONFIG.extra.forEach(function (p) { frame('img/', p, $('#extraGrid')); });
 
   observe();
