@@ -27,7 +27,7 @@
       { photo: 'img/cars/hilux.jpg', name: 'Toyota Hilux', line: 'The latest model. Built to carry whatever life puts on it.', chips: ['Latest model', '4×4', 'Unstoppable'] },
       { photo: 'img/cars/civic.jpg', name: 'Honda Civic RS', line: 'Sharp, quick and honest, just like the man who drives it.', chips: ['RS', 'Turbo', 'Daily thrill'] },
       { photo: 'img/cars/antique.jpg', name: 'The Collector\'s Classic', line: 'For the billionaire in him: a vintage beauty that only improves with age.', chips: ['Vintage', 'Hand-built', 'Timeless'] },
-      { name: 'F-22 Raptor', line: 'The sky is not the limit. For a pilot at heart, it is home.', chips: ['Air dominance', 'Stealth', 'Pilot at heart'] }
+      { photo: 'img/cars/raptor.jpg', name: 'F-22 Raptor', line: 'The sky is not the limit. For a pilot at heart, it is home.', chips: ['Air dominance', 'Stealth', 'Pilot at heart'] }
     ],
     portraits: [             // [file in img/his/, title, hover line, wide?]
       ['aviators.jpg', 'The Aviators', 'that effortless look'],
@@ -39,6 +39,8 @@
     icons: [
       ['icons/mustang.jpg', 'Fastback', 'steel, sunlight and a V8 hum'],
       ['icons/cobra.jpg', 'The Cobra', 'raw, red and unapologetic', true],
+      ['icons/watch.jpg', 'Time, well kept', 'automatic, fluted, unhurried', true],
+      ['icons/aviators.jpg', 'Aviators', 'a pilot\'s signature'],
       ['icons/lighter.jpg', 'Gold, lit', 'a flame worth the wait'],
       ['icons/goldleaf.jpg', 'Gold Leaf', 'his small ritual']
     ],
