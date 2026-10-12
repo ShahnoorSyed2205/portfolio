@@ -6,8 +6,9 @@
   'use strict';
 
   var CONFIG = {
-    name: 'Sami',            // his name (CHANGE ME if wrong), used across the page
-    from: 'Syeda',           // sign-off on the letter
+    name: 'Mr. Khan',        // his name, used across the page
+    nick: 'Pathaan',         // nickname, used in the letter greeting
+    from: 'Ms. Syeda',           // sign-off on the letter
     music: 'music/song.mp3', // optional: your own track. If missing, a slow romantic score plays instead.
     wishes: [                // 10 wishes hidden in the 3D objects (ids match the scene)
       'May every road ahead be smooth, and every green light yours.',
@@ -32,7 +33,7 @@
       ['aviators.jpg', 'The Aviators', 'that effortless look'],
       ['bench.jpg', 'Effortless', 'completely at ease', true],
       ['night.jpg', 'Quiet confidence', 'no words needed'],
-      ['grass.jpg', 'That smile', 'worth waiting for'],
+      ['watch.jpg', 'Time well kept', 'elegance, down to the wrist'],
       ['levis.jpg', 'Always composed', 'calm in every room']
     ],
     extra: []                // more photos: [['armoury/file.jpg', 'Title', 'hover line']] in img/
@@ -50,6 +51,7 @@
   };
 
   $$('.js-name').forEach(function (e) { e.textContent = CONFIG.name; });
+  $$('.js-nick').forEach(function (e) { e.textContent = CONFIG.nick; });
   $$('.js-from').forEach(function (e) { e.textContent = CONFIG.from; });
   var mono = $('.mono'); if (mono) mono.textContent = CONFIG.name.charAt(0).toUpperCase();
   document.title = 'Happy Birthday ' + CONFIG.name + ' ✦';
