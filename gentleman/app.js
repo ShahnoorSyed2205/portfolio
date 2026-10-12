@@ -323,7 +323,7 @@
 
   function frame(base, item, grid, reveal) {
     var fig = document.createElement('figure'); fig.className = 'gframe reveal' + (item[3] ? ' wide' : ''); fig.tabIndex = 0; fig.setAttribute('role', 'button'); fig.setAttribute('aria-label', 'Open photo: ' + item[1]);
-    var img = new Image(); img.alt = item[1]; img.loading = 'lazy';
+    var img = new Image(); img.alt = item[1]; img.decoding = 'async';
     fig.innerHTML = '<div class="fr"></div><figcaption><span class="script"></span><small>tap to open ✦</small></figcaption><span class="bubble"></span>';
     $('.fr', fig).appendChild(img); $('.script', fig).textContent = item[1]; $('.bubble', fig).textContent = item[2] || '';
     var src = base + item[0];

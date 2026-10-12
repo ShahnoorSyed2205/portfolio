@@ -264,10 +264,4 @@ body.locked .hero .reveal{opacity:0}
 .g-photo{display:block;width:100%;height:120px;object-fit:cover;margin:10px 0 4px;border:1px solid var(--line);cursor:pointer}
 .g-photo[hidden]{display:none}
 
-/* performance: lighter glass on small screens */
-@media (max-width:860px),(pointer:coarse){
-  .card,.g-card,.btn-ghost,.g-btn,.hud-btn,.hud-brand,.wishes-hud{backdrop-filter:none;-webkit-backdrop-filter:none;background:rgba(10,8,10,.82)}
-  .g-photo{height:96px}
-  .lightbox{backdrop-filter:none}
-}
 @media (max-width:860px){ .hero .wrap{background:radial-gradient(ellipse at 50% 45%,rgba(5,4,7,.78),rgba(5,4,7,0) 72%)} .lead{text-shadow:0 2px 14px #000} }
