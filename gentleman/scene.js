@@ -13,7 +13,7 @@
   var renderer;
   try { renderer = new T.WebGLRenderer({ canvas: canvas, antialias: !small, powerPreference: 'high-performance' }); }
   catch (err) { document.documentElement.classList.add('no-webgl'); return; }
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, small ? 1.5 : 2));
+  renderer.setPixelRatio(1);
   renderer.outputEncoding = T.sRGBEncoding;
   renderer.toneMapping = T.ACESFilmicToneMapping;
   renderer.toneMappingExposure = 1.0;
@@ -23,6 +23,7 @@
   scene.fog = new T.FogExp2(0x050407, .014);
   var camera = new T.PerspectiveCamera(46, 1, .1, 700);
 
+  var fl = function () { var o = new T.Object3D(); o.intensity = 0; o.target = new T.Object3D(); return o; };   // stand-in: real headlight spots cost too much per pixel
   var rand = function (a, b) { return a + Math.random() * (b - a); };
   var lerp = function (a, b, t) { return a + (b - a) * t; };
   var clamp = function (x, a, b) { return Math.min(b, Math.max(a, x)); };
@@ -67,7 +68,7 @@
   })();
   function paint(hex) {
     return small ? new T.MeshStandardMaterial({ color: hex, metalness: .7, roughness: .28 })
-      : new T.MeshPhysicalMaterial({ color: hex, metalness: .78, roughness: .34, clearcoat: 1, clearcoatRoughness: .035, normalMap: flakeTex, normalScale: new T.Vector2(.18, .18), envMapIntensity: 1.25 });
+      : new T.MeshPhysicalMaterial({ color: hex, metalness: .78, roughness: .34, clearcoat: small ? 0 : 1, clearcoatRoughness: .035, normalMap: flakeTex, normalScale: new T.Vector2(.18, .18), envMapIntensity: 1.25 });
   }
   function glowMat(hex, k) { return new T.MeshStandardMaterial({ color: 0x1a1a1a, emissive: hex, emissiveIntensity: k || 0, roughness: .3 }); }
 
@@ -200,16 +201,17 @@
     car.add(box(.5, .24, 1.7, dark, I.dx, I.dy, 0)); car.add(box(1.3, .05, 1.7, dark, I.x - .2, .36, 0));
     var sw = mesh(new T.TorusGeometry(.16, .022, 10, 28), dark, I.dx - .2, I.dy + .2, S.drv); sw.rotation.y = Math.PI / 2; sw.rotation.x = .3; car.add(sw);
     var led = glowMat(0xffb35a, 0); car.add(box(1.3, .018, .018, led, .1, .42, interp(S.width, .1) - .02)); tr.led = led;
-    var cab = new T.PointLight(0xffc27a, 0, 4.5, 2); cab.position.set(I.x, I.y + .5, .3); car.add(cab); tr.cab = cab;
+    var cab = S.cab ? new T.PointLight(0xffc27a, 0, 4.5, 2) : fl(); cab.position.set(I.x, I.y + .5, .3); car.add(cab); tr.cab = cab;
     tr.head = glowMat(0xfff0c8, 0); tr.tail = glowMat(0xff2418, .5); tr.amber = glowMat(0xffa020, 0);
     S.extras(car, tr, S);
-    tr.beams = [-1, 1].map(function (s) { var b = new T.SpotLight(0xfff0d0, 0, 22, .42, .6, 1.4); b.position.set(S.x1 - .15, S.lampY, s * .6); b.target.position.set(S.x1 + 10, .2, s * .5); car.add(b); car.add(b.target); return b; });
+    tr.beams = [-1, 1].map(function (s) { var b = fl(); b.position.set(S.x1 - .15, S.lampY, s * .6); b.target.position.set(S.x1 + 10, .2, s * .5); car.add(b); car.add(b.target); return b; });
     var sh = mesh(new T.PlaneGeometry((S.x1 - S.x0) * 1.25, 2.9), new T.MeshBasicMaterial({ map: glowTex, color: 0x000000, transparent: true, opacity: .75, depthWrite: false }), (S.x0 + S.x1) / 2, .012, 0); sh.rotation.x = -Math.PI / 2; car.add(sh);
     car.userData.t = tr; car.userData.hit = S.hitR; return car;
   }
 
   var SPECS = {
     bmw: {
+      cab: true,
       mat: paint(0x16315f), n: 4.6, tum: .07, x0: -2.4, x1: 2.4, cap0: .3, cap1: .42, hw: .93, drv: .44, lampY: .72, wheelR: .36, wheelW: .26, arch: .43, wheelX: [1.42, -1.38], hitR: 2.6,
       bottom: [[-2.4, .44], [-2.2, .33], [2.1, .33], [2.4, .42]],
       top: [[-2.4, .66], [-2.25, .9], [-1.8, 1.0], [-1.0, 1.03], [1.0, 1.0], [1.6, .93], [2.1, .8], [2.4, .66]],
@@ -324,7 +326,7 @@
     [1, -1].forEach(function (s) { var p = box(.03, .56, .03, chrome, .56, 1.5, s * .66); p.rotation.z = -.2; car.add(p); });
     var top = mesh(new T.CylinderGeometry(.14, .14, 1.4, 20), blk, -2.05, 1.18, 0); top.rotation.x = Math.PI / 2; car.add(top);
     var spare = makeWheel(R * .9, .2, true); spare.rotation.y = Math.PI / 2; spare.position.set(-2.6, .86, 0); car.add(spare); car.add(box(.1, .06, .5, chrome, -2.52, .56, 0));
-    tr.beams = [-1, 1].map(function (s) { var b = new T.SpotLight(0xfff0d0, 0, 22, .4, .6, 1.4); b.position.set(2.0, 1.15, s * .64); b.target.position.set(12, .3, s * .5); car.add(b); car.add(b.target); return b; });
+    tr.beams = [-1, 1].map(function (s) { var b = fl(); b.position.set(2.0, 1.15, s * .64); b.target.position.set(12, .3, s * .5); car.add(b); car.add(b.target); return b; });
     tr.exhaust = V(-2.6, .42, .74);
     var sh = mesh(new T.PlaneGeometry(6.4, 3), new T.MeshBasicMaterial({ map: glowTex, color: 0x000000, transparent: true, opacity: .75, depthWrite: false }), -.1, .012, 0); sh.rotation.x = -Math.PI / 2; car.add(sh);
     car.userData.t = tr; car.userData.hit = 3.2; return car;
@@ -615,7 +617,11 @@
     if (Math.abs((drag && drag.moved) || 0) > 6) return;
     var h = pick(e.clientX, e.clientY);
     if (h) { var it = h.object.userData.item; it.pop = 1; found[it.id] = true; burstAt(h.point, 80, 5.5); if (M.onPick) M.onPick(it.id); }
-    else burstAt(w2s(e.clientX, e.clientY, 12), 14, 2.4);
+    else {
+      var ch = ray.intersectObjects([bmw, hilux, civic, antique, raptor], true);
+      if (ch.length) { var o = ch[0].object; while (o && !(o === bmw || o === hilux || o === civic || o === antique || o === raptor)) o = o.parent; var ci = [bmw, hilux, civic, antique, raptor].indexOf(o); if (ci > -1) { burstAt(ch[0].point, 40, 4); if (M.onCarTap) M.onCarTap(ci); return; } }
+      burstAt(w2s(e.clientX, e.clientY, 12), 14, 2.4);
+    }
   });
 
   /* ---------- public API ---------- */
@@ -635,14 +641,26 @@
   var cp = V(0, 0, 0), cl = V(0, 0, 0), gP = V(0, 0, 0), gL = V(0, 0, 0);
   function setBeams(c, k) { c.userData.t.beams.forEach(function (b) { b.intensity = k * 3.2; }); }
 
-  function frame() {
-    requestAnimationFrame(frame); if (document.hidden) return;
+  var cT = new T.Color(0x0b1233), cM = new T.Color(0x9a4220), cB = new T.Color(0xf6b255);
+  /* adaptive resolution: drop pixel ratio when frames run long, creep back up when there is headroom */
+  var dprMax = Math.min(window.devicePixelRatio || 1, small ? 1.25 : 1.5), dpr = dprMax, ftAvg = 16, lastAdapt = 0;
+  renderer.setPixelRatio(dpr);
+  function adapt(ms, now) {
+    ftAvg += (ms - ftAvg) * .08;
+    if (now - lastAdapt < 700) return; lastAdapt = now;
+    if (ftAvg > 26 && dpr > .6) { dpr = Math.max(.6, dpr - .15); renderer.setPixelRatio(dpr); renderer.setSize(innerWidth, innerHeight, false); }
+    else if (ftAvg < 15 && dpr < dprMax) { dpr = Math.min(dprMax, dpr + .1); renderer.setPixelRatio(dpr); renderer.setSize(innerWidth, innerHeight, false); }
+  }
+  var lastNow = 0;
+  function frame(now) {
+    requestAnimationFrame(frame); if (document.hidden) { lastNow = 0; return; }
+    if (lastNow) adapt(now - lastNow, now); lastNow = now;
     var dt = Math.min(.05, clock.getDelta()), t = clock.elapsedTime; timeU.value = t;
     sY += ((window.scrollY || 0) - sY) * Math.min(1, dt * 4.2);
 
     // mood (studio -> sunset)
     var mood = ss(moodA, moodB, sY);
-    skyU.uTop.value.setHex(0x050407).lerp(new T.Color(0x0b1233), mood); skyU.uMid.value.setHex(0x0a0709).lerp(new T.Color(0x9a4220), mood); skyU.uBot.value.setHex(0x100a08).lerp(new T.Color(0xf6b255), mood);
+    skyU.uTop.value.setHex(0x050407).lerp(cT, mood); skyU.uMid.value.setHex(0x0a0709).lerp(cM, mood); skyU.uBot.value.setHex(0x100a08).lerp(cB, mood);
     scene.fog.color.copy(skyU.uMid.value).multiplyScalar(.9); scene.fog.density = lerp(.014, .006, mood); scene.background.copy(skyU.uBot.value);
     sky.position.copy(camera.position); sun.position.set(camera.position.x, 14, camera.position.z - 400); sunCore.position.copy(sun.position); sun.material.opacity = mood * .9; sunCore.material.opacity = mood * .9;
     barM.color.setHex(0xfff0d0).multiplyScalar(1 - mood * .7);
@@ -738,5 +756,5 @@
   var lastSpinCar = -1;
   renderer.render(scene, camera);
   if (location.hash === '#debug') window.__magic = { camera: camera, THREE: T, cars: cars, P: P, scene: scene, fin: fin, alive: function () { var n = 0; for (var i = 0; i < PN; i++) if (pLife[i] > 0) n++; return n; }, keys: function () { return keys; }, sY: function () { return sY; } };
-  frame();
+  requestAnimationFrame(frame);
 })();

@@ -23,11 +23,11 @@
       'Here is to calm after every storm, and peace of mind.'
     ],
     cars: [                  // garage stops, in scroll order (matches the 3D scene)
-      { name: 'BMW', line: 'Precision, presence and a quiet kind of power.', chips: ['Sport coupé', 'Twin-turbo', 'Pure poise'] },
-      { photo: 'img/cars/hilux.jpg', name: 'Toyota Hilux', line: 'The latest model. Built to carry whatever life puts on it.', chips: ['Latest model', '4×4', 'Unstoppable'] },
-      { photo: 'img/cars/civic.jpg', name: 'Honda Civic RS', line: 'Sharp, quick and honest, just like the man who drives it.', chips: ['RS', 'Turbo', 'Daily thrill'] },
-      { photo: 'img/cars/antique.jpg', name: 'The Collector\'s Classic', line: 'For the billionaire in him: a vintage beauty that only improves with age.', chips: ['Vintage', 'Hand-built', 'Timeless'] },
-      { photo: 'img/cars/raptor.jpg', name: 'F-22 Raptor', line: 'The sky is not the limit. For a pilot at heart, it is home.', chips: ['Air dominance', 'Stealth', 'Pilot at heart'] }
+      { sfx: 'bmw', name: 'BMW', line: 'Precision, presence and a quiet kind of power.', chips: ['Sport coupé', 'Twin-turbo', 'Pure poise'] },
+      { photo: 'img/cars/hilux.jpg', sfx: 'diesel', name: 'Toyota Hilux', line: 'The latest model. Built to carry whatever life puts on it.', chips: ['Latest model', '4×4', 'Unstoppable'] },
+      { photo: 'img/cars/civic.jpg', sfx: 'civic', name: 'Honda Civic RS', line: 'Sharp, quick and honest, just like the man who drives it.', chips: ['RS', 'Turbo', 'Daily thrill'] },
+      { photo: 'img/cars/antique.jpg', sfx: 'antique', name: 'The Collector\'s Classic', line: 'For the billionaire in him: a vintage beauty that only improves with age.', chips: ['Vintage', 'Hand-built', 'Timeless'] },
+      { photo: 'img/cars/raptor.jpg', sfx: 'jet', name: 'F-22 Raptor', line: 'The sky is not the limit. For a pilot at heart, it is home.', chips: ['Air dominance', 'Stealth', 'Pilot at heart'] }
     ],
     portraits: [             // [file in img/his/, title, hover line, wide?]
       ['aviators.jpg', 'The Aviators', 'that effortless look'],
@@ -37,16 +37,16 @@
       ['levis.jpg', 'Always composed', 'calm in every room']
     ],
     icons: [
-      ['icons/mustang.jpg', 'Fastback', 'steel, sunlight and a V8 hum'],
-      ['icons/cobra.jpg', 'The Cobra', 'raw, red and unapologetic', true],
+      ['icons/mustang.jpg', 'Fastback', 'steel, sunlight and a V8 hum', false, 'v8'],
+      ['icons/cobra.jpg', 'The Cobra', 'raw, red and unapologetic', true, 'v8'],
       ['icons/watch.jpg', 'Time, well kept', 'automatic, fluted, unhurried', true],
       ['icons/aviators.jpg', 'Aviators', 'a pilot\'s signature'],
-      ['icons/lighter.jpg', 'Gold, lit', 'a flame worth the wait'],
-      ['icons/goldleaf.jpg', 'Gold Leaf', 'his small ritual']
+      ['icons/lighter.jpg', 'Gold, lit', 'a flame worth the wait', false, 'lighter'],
+      ['icons/goldleaf.jpg', 'Gold Leaf', 'his small ritual', false, 'lighter']
     ],
     extra: [
-      ['armoury/rifles.jpg', 'The rifles', 'a collector\'s eye', true],
-      ['armoury/glock.jpg', 'Glock 34', 'precision, boxed and kept']
+      ['armoury/rifles.jpg', 'The rifles', 'a collector\'s eye', true, 'rifle'],
+      ['armoury/glock.jpg', 'Glock 34', 'precision, boxed and kept', false, 'pistol']
     ]                        // more photos: [['armoury/file.jpg', 'Title', 'hover line']] in img/
   };
 
@@ -117,11 +117,11 @@
       o.type = 'sine'; o2.type = 'triangle';
       o.frequency.setValueAtTime(from ? mtof(from) : f0, t); o.frequency.exponentialRampToValueAtTime(f0, t + (from ? .14 : .01));
       o2.frequency.setValueAtTime(from ? mtof(from) * 2 : f0 * 2, t); o2.frequency.exponentialRampToValueAtTime(f0 * 2, t + (from ? .14 : .01));
-      lfo.frequency.value = 5.2; lg.gain.value = f0 * .006; lfo.connect(lg); lg.connect(o.frequency);
+      lfo.frequency.value = 5.2; lg.gain.value = f0 * .0035; lfo.connect(lg); lg.connect(o.frequency);
       var g2 = ctx.createGain(); g2.gain.value = .12; o2.connect(g2);
       g.gain.setValueAtTime(0.0001, t); g.gain.linearRampToValueAtTime(vol, t + .12); g.gain.setValueAtTime(vol, t + Math.max(.14, dur - .25)); g.gain.linearRampToValueAtTime(0.0001, t + dur);
       o.connect(g); g2.connect(g); send(g);
-      noise(t, dur, f0 * 2, f0 * 2, 3, vol * .1, musicBus, true);   // breath
+      noise(t, dur, f0 * 2, f0 * 2, 3, vol * .05, musicBus, true);   // breath
       o.start(t); o2.start(t); lfo.start(t); o.stop(t + dur + .05); o2.stop(t + dur + .05); lfo.stop(t + dur + .05); notes++;
     }
     function pad(midis, t, dur, vol) {
@@ -134,28 +134,35 @@
         });
       });
     }
-    function tabla(t, kind) {
-      if (kind === 'dha') { var o = ctx.createOscillator(), g = ctx.createGain(); o.frequency.setValueAtTime(190, t); o.frequency.exponentialRampToValueAtTime(82, t + .16); env(g, t, .004, .07, .32); o.connect(g); send(g, musicBus, false); o.start(t); o.stop(t + .4); noise(t, .06, 2500, 1200, 1, .012, musicBus, false); }
-      else { tone(520, t, .12, .022, 'sine', musicBus, false); noise(t, .05, 3200, 3200, 2, .008, musicBus, false); }
+    /* soft celesta/piano-style voice: sine body + quiet octave, quick pluck, long tail */
+    function bell(midi, t, dur, vol) {
+      var f = mtof(midi), o = ctx.createOscillator(), o2 = ctx.createOscillator(), g = ctx.createGain(), g2 = ctx.createGain(), lp = ctx.createBiquadFilter();
+      o.type = 'sine'; o.frequency.value = f; o2.type = 'sine'; o2.frequency.value = f * 2; g2.gain.value = .22; lp.type = 'lowpass'; lp.frequency.value = 3600;
+      g.gain.setValueAtTime(0.0001, t); g.gain.linearRampToValueAtTime(vol, t + .012); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+      o.connect(lp); o2.connect(g2); g2.connect(lp); lp.connect(g); send(g); o.start(t); o2.start(t); o.stop(t + dur + .05); o2.stop(t + dur + .05); notes++;
     }
-
-    var CH = [[50, 57, 62, 65], [46, 53, 58, 62], [43, 50, 55, 58], [45, 52, 57, 61]];   // Dm Bb Gm A
-    var PH = [
-      [[69, 1.5], [72, .5], [74, 1], [72, 1]], [[70, 1], [69, 1], [67, 1], [69, 1]],
-      [[74, 1], [77, 1], [76, .5], [74, .5], [72, 1]], [[69, 1], [67, .5], [65, .5], [64, 1], [62, 1.5]]
+    function softPad(midis, t, dur, vol) {
+      midis.forEach(function (m, i) {
+        var o = ctx.createOscillator(), g = ctx.createGain(), f = ctx.createBiquadFilter();
+        o.type = 'triangle'; o.frequency.value = mtof(m); f.type = 'lowpass'; f.frequency.value = 1100;
+        g.gain.setValueAtTime(0.0001, t); g.gain.linearRampToValueAtTime(vol, t + dur * .45); g.gain.linearRampToValueAtTime(0.0001, t + dur + .8);
+        o.connect(f); f.connect(g); send(g); o.start(t); o.stop(t + dur + .9);
+      });
+    }
+    /* D major, slow: Bm7 - Gmaj7 - D - A. Gentle pad, soft bass, rolling celesta arpeggio, lyrical flute line. */
+    var CH = [[59, 62, 66, 69], [55, 59, 62, 66], [57, 62, 66, 69], [57, 61, 64, 69]], ROOT = [47, 43, 50, 45];
+    var MEL = [
+      [[78, 1.5], [76, .5], [74, 2]], [[71, 1], [74, 1], [79, 2]],
+      [[78, 1], [74, 1], [76, 1], [78, 1]], [[76, 1.5], [73, .5], [74, 2]]
     ];
-    var BEAT = 60 / 58, bar = 0, nextBar = 0;
+    var ARP = [0, 1, 2, 3, 2, 1, 2, 3], BEAT = 60 / 58, bar = 0, nextBar = 0;
     function scheduleBar(t) {
       var ch = CH[bar % 4], B = BEAT;
-      pad(ch, t, B * 4, .0085);
-      pluck(mtof(38), t, .028, B * 3.6, 'sawtooth', 500); pluck(mtof(45), t + B * 1.5, .02, B * 2.6, 'sawtooth', 600);   // tanpura-ish drone
-      pluck(mtof(ch[0] - 12), t, .05, B * 3, 'sine', 400);
-      tabla(t, 'dha'); tabla(t + B * 1.5, 'tin'); tabla(t + B * 2, 'dha'); tabla(t + B * 3.5, 'tin');
-      if (bar % 2 === 1 || bar % 4 === 0) {
-        var ph = PH[(bar >> 1) % PH.length], tt = t + B * .5, prev = null;
-        ph.forEach(function (n) { flute(n[0], tt, n[1] * B * .98, .05, prev); prev = n[0]; tt += n[1] * B; });
-      }
-      for (var k = 0; k < 4; k++) pluck(mtof(ch[(k + 1) % 4] + 24), t + k * B + B * .75, .012, 2, 'sine', 3000);   // soft sparkles
+      softPad(ch, t, B * 4, .011);
+      pluck(mtof(ROOT[bar % 4]), t, .05, B * 3.4, 'sine', 380);
+      for (var k = 0; k < 8; k++) bell(ch[ARP[k]] + (k % 4 === 3 ? 12 : 0), t + k * B * .5, 1.8, .017 + (k % 2 ? 0 : .006));
+      var mel = MEL[bar % 4], tt = t + B * .25, prev = null;
+      if (bar % 8 < 6) mel.forEach(function (n) { flute(n[0], tt, n[1] * B * .98, .034, prev); bell(n[0] + 12, tt, 2.2, .008); prev = n[0]; tt += n[1] * B; });
       bar++;
     }
     function startSynth() {
@@ -192,7 +199,47 @@
       e.g.gain.cancelScheduledValues(t); e.g.gain.setValueAtTime(e.g.gain.value, t); e.g.gain.linearRampToValueAtTime(.2, t + .5); e.g.gain.linearRampToValueAtTime(.12, t + 2.2);
     }
 
+
+    /* --- per-object sounds --- */
+    function gunShot(t, vol, tail) {
+      noise(t, .09, 6000, 900, .6, vol, sfxBus, true);                       // crack
+      noise(t, tail || .45, 2200, 140, .5, vol * .55, sfxBus, true);         // report + room
+      var o = ctx.createOscillator(), g = ctx.createGain(); o.frequency.setValueAtTime(170, t); o.frequency.exponentialRampToValueAtTime(34, t + .22);
+      env(g, t, .002, vol * .9, .3); o.connect(g); g.connect(sfxBus); o.start(t); o.stop(t + .35);
+    }
+    function engineBlip(kind) {
+      var P = {
+        bmw:     { f0: 52, f1: 190, lp: 1100, type: 'sawtooth', am: 0,  dur: 2.1, vol: .16 },
+        diesel:  { f0: 36, f1: 96,  lp: 520,  type: 'square',   am: 26, dur: 2.2, vol: .16 },
+        civic:   { f0: 60, f1: 260, lp: 1500, type: 'sawtooth', am: 0,  dur: 1.9, vol: .14 },
+        antique: { f0: 26, f1: 62,  lp: 420,  type: 'square',   am: 13, dur: 2.4, vol: .17 },
+        v8:      { f0: 38, f1: 140, lp: 760,  type: 'sawtooth', am: 19, dur: 2.5, vol: .19 }
+      }[kind] || null; if (!P) return;
+      var t = ctx.currentTime, o = ctx.createOscillator(), o2 = ctx.createOscillator(), g = ctx.createGain(), lp = ctx.createBiquadFilter(), am = ctx.createGain(), lfo = ctx.createOscillator(), lg = ctx.createGain();
+      o.type = P.type; o2.type = 'sawtooth'; lp.type = 'lowpass'; lp.Q.value = 2.5; am.gain.value = P.am ? .55 : 1;
+      o.frequency.setValueAtTime(P.f0, t); o.frequency.exponentialRampToValueAtTime(P.f1, t + .7); o.frequency.exponentialRampToValueAtTime(P.f0 * 1.1, t + P.dur);
+      o2.frequency.setValueAtTime(P.f0 * 2.01, t); o2.frequency.exponentialRampToValueAtTime(P.f1 * 2.01, t + .7); o2.frequency.exponentialRampToValueAtTime(P.f0 * 2.2, t + P.dur);
+      lp.frequency.setValueAtTime(P.lp * .5, t); lp.frequency.linearRampToValueAtTime(P.lp * 1.5, t + .7); lp.frequency.linearRampToValueAtTime(P.lp * .5, t + P.dur);
+      if (P.am) { lfo.frequency.value = P.am; lg.gain.value = .45; lfo.connect(lg); lg.connect(am.gain); lfo.start(t); lfo.stop(t + P.dur + .1); }
+      g.gain.setValueAtTime(0.0001, t); g.gain.linearRampToValueAtTime(P.vol, t + .12); g.gain.setValueAtTime(P.vol, t + P.dur - .5); g.gain.linearRampToValueAtTime(0.0001, t + P.dur);
+      var g2 = ctx.createGain(); g2.gain.value = .35; o2.connect(g2); o.connect(lp); g2.connect(lp); lp.connect(am); am.connect(g); g.connect(sfxBus); g.connect(master.rv);
+      o.start(t); o2.start(t); o.stop(t + P.dur + .1); o2.stop(t + P.dur + .1);
+      if (kind === 'v8' || kind === 'antique') noise(t + P.dur * .72, .12, 1500, 300, 1, .1, sfxBus, true);   // exhaust pop
+    }
+    function jetRoar() { var t = ctx.currentTime; noise(t, 3, 300, 3000, .8, .17, sfxBus, true); noise(t + 1.2, 2.2, 3000, 200, .8, .12, sfxBus, true); tone(58, t, 3, .07, 'sawtooth', sfxBus, false); }
+    function lighterFlick() { var t = ctx.currentTime; tone(3300, t, .05, .06, 'square', sfxBus, false); tone(2300, t + .09, .12, .05, 'square', sfxBus, false); noise(t + .16, .35, 900, 300, 1.5, .09, sfxBus, true); }
+    function playKind(k) {
+      if (!ctx || !enabled) return; if (ctx.state === 'suspended') ctx.resume();
+      var t = ctx.currentTime;
+      if (k === 'pistol') gunShot(t, .5, .5);
+      else if (k === 'rifle') { gunShot(t, .5, .4); gunShot(t + .11, .45, .4); gunShot(t + .22, .45, .7); }
+      else if (k === 'jet') jetRoar();
+      else if (k === 'lighter') lighterFlick();
+      else engineBlip(k);
+    }
+
     return {
+      play: playKind,
       start: function () {
         init(); if (ctx && ctx.state === 'suspended') ctx.resume();
         if (started) return; started = true;
@@ -282,7 +329,7 @@
     var src = base + item[0];
     img.onload = function () { grid.appendChild(fig); grid.parentNode.hidden = false; var sec = grid.closest('section'); if (sec) sec.hidden = false; observe(); if (canTilt) tiltify(fig); };
     img.onerror = function () {};
-    fig.addEventListener('click', function (e) { MAGIC.sparkle(e.clientX, e.clientY, 26); openLb(src, item[1], item[1]); });
+    fig.addEventListener('click', function (e) { MAGIC.sparkle(e.clientX, e.clientY, 26); openLb(src, item[1], item[1]); if (item[4]) Sound.play(item[4]); });
     fig.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openLb(src, item[1], item[1]); } });
     img.src = src;
   }
@@ -308,7 +355,9 @@
     }, 220);
     $$('#gDots i').forEach(function (e, k) { e.classList.toggle('on', k === i); });
   }
-  $('#gPhoto').addEventListener('click', function (e) { var p = e.currentTarget; if (p.src) openLb(p.src, p.alt, p.alt); });
+  $('#gPhoto').addEventListener('click', function (e) { var p = e.currentTarget; if (p.src) openLb(p.src, p.alt, p.alt); Sound.play(CONFIG.cars[curCar].sfx); });
+  gCard.addEventListener('click', function (e) { if (e.target.id !== 'gPhoto') { Sound.play(CONFIG.cars[curCar].sfx); MAGIC.sparkle(e.clientX, e.clientY, 22); } });
+  MAGIC.onCarTap = function (i) { Sound.play(CONFIG.cars[i].sfx); };
   MAGIC.onCar = showCar; showCar(0);
   function goCar(i) {
     i = Math.max(0, Math.min(N - 1, i));
@@ -357,29 +406,27 @@
   $$('a[href^="#"]').forEach(function (a) { a.addEventListener('click', function (e) { var t = $(a.getAttribute('href')); if (!t) return; e.preventDefault(); t.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth' }); }); });
 
   /* ============================================================
-     CURSOR: gold steering wheel + ring + golden trail
+     CURSOR: sleek gold dot + hairline ring, zero lag
      ============================================================ */
   (function () {
     if (!window.matchMedia('(hover:hover) and (pointer:fine)').matches) return;
-    var root = document.documentElement, NS = 'http://www.w3.org/2000/svg';
+    var root = document.documentElement;
     var ring = document.createElement('div'); ring.className = 'cur-ring'; var cur = document.createElement('div'); cur.className = 'cur';
-    var svg = document.createElementNS(NS, 'svg'), use = document.createElementNS(NS, 'use'); use.setAttribute('href', '#wheel'); svg.appendChild(use); svg.setAttribute('aria-hidden', 'true'); cur.appendChild(svg);
     document.body.appendChild(ring); document.body.appendChild(cur); root.classList.add('has-cursor');
-    var HOVER = 'a,button,.fob,.card,.gframe,.g-chips li,.g-dots i,.envelope,.lb-close,[data-tip],input';
-    var tx = innerWidth / 2, ty = innerHeight / 2, x = tx, y = ty, rx = x, ry = y, rot = 0, sc = 1, down = false, over = false, shown = false, lastTrail = 0;
-    var GL = ['✦', '◆', '·', '✧', '✦'];
+    var HOVER = 'a,button,.fob,.card,.gframe,.g-card,.g-photo,.g-chips li,.g-dots i,.envelope,.lb-close,[data-tip],input';
+    var shown = false;
     addEventListener('pointermove', function (e) {
-      if (e.pointerType === 'touch') return; tx = e.clientX; ty = e.clientY;
-      if (!shown) { shown = true; x = rx = tx; y = ry = ty; cur.classList.add('on'); ring.classList.add('on'); }
-      var t = e.target; over = !!(t.closest && t.closest(HOVER)) || root.classList.contains('hover3d');
-      cur.classList.toggle('is-hover', over); ring.classList.toggle('is-hover', over);
-      var now = performance.now(); if (!reduce && now - lastTrail > 55 && Math.hypot(e.movementX || 0, e.movementY || 0) > 2) { lastTrail = now; trail(tx, ty); }
+      if (e.pointerType === 'touch') return;
+      var m = 'translate3d(' + e.clientX + 'px,' + e.clientY + 'px,0)'; cur.style.transform = m; ring.style.transform = m;
+      if (!shown) { shown = true; cur.classList.add('on'); ring.classList.add('on'); }
+      var t = e.target, over = !!(t.closest && t.closest(HOVER)) || root.classList.contains('hover3d');
+      if (over !== cur.classList.contains('is-hover')) { cur.classList.toggle('is-hover', over); ring.classList.toggle('is-hover', over); }
     }, { passive: true });
     document.addEventListener('pointerleave', function () { cur.classList.remove('on'); ring.classList.remove('on'); shown = false; });
-    document.addEventListener('pointerdown', function () { down = true; cur.classList.add('down'); ring.classList.add('down'); });
-    addEventListener('pointerup', function (e) { down = false; cur.classList.remove('down'); ring.classList.remove('down'); ripple(e.clientX, e.clientY); });
-    function trail(px, py) { var s = document.createElement('span'); s.className = 'cur-trail'; s.textContent = GL[(Math.random() * GL.length) | 0]; s.style.cssText = 'left:' + px + 'px;top:' + py + 'px;--dx:' + ((Math.random() - .5) * 40).toFixed(0) + 'px;font-size:' + (9 + Math.random() * 11).toFixed(0) + 'px'; document.body.appendChild(s); setTimeout(function () { s.remove(); }, 950); }
-    function ripple(px, py) { if (reduce) return; var r = document.createElement('span'); r.className = 'cur-ripple'; r.style.left = px + 'px'; r.style.top = py + 'px'; document.body.appendChild(r); setTimeout(function () { r.remove(); }, 700); for (var k = 0; k < 4; k++) trail(px + (Math.random() - .5) * 20, py + (Math.random() - .5) * 20); }
-    (function loop() { requestAnimationFrame(loop); var k = reduce ? 1 : .34, k2 = reduce ? 1 : .14; var vx = tx - x; x += vx * k; y += (ty - y) * k; rx += (tx - rx) * k2; ry += (ty - ry) * k2; rot += (Math.max(-30, Math.min(30, vx * 1.1)) - rot) * .18; var target = down ? .82 : over ? 1.2 : 1; sc += (target - sc) * .22; cur.style.transform = 'translate3d(' + x.toFixed(1) + 'px,' + y.toFixed(1) + 'px,0) rotate(' + rot.toFixed(1) + 'deg) scale(' + sc.toFixed(3) + ')'; ring.style.transform = 'translate3d(' + rx.toFixed(1) + 'px,' + ry.toFixed(1) + 'px,0)'; })();
+    document.addEventListener('pointerdown', function () { cur.classList.add('down'); ring.classList.add('down'); });
+    addEventListener('pointerup', function (e) {
+      cur.classList.remove('down'); ring.classList.remove('down'); if (reduce) return;
+      var r = document.createElement('span'); r.className = 'cur-ripple'; r.style.left = e.clientX + 'px'; r.style.top = e.clientY + 'px'; document.body.appendChild(r); setTimeout(function () { r.remove(); }, 520);
+    });
   })();
 })();
