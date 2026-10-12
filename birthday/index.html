@@ -1,0 +1,391 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Happy Birthday ✦ A Tiny Enchanted World</title>
+<meta name="description" content="A tiny enchanted world, stitched together for a birthday.">
+<meta name="theme-color" content="#1a0d33">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Great+Vibes&family=Jost:wght@300;400;500&family=Fredoka:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='48' fill='%23f6dfb8'/%3E%3Crect x='31' y='30' width='38' height='56' rx='17' fill='%23dba35d'/%3E%3Crect x='31' y='46' width='38' height='17' fill='%23fff4e0'/%3E%3Cellipse cx='50' cy='27' rx='25' ry='6' fill='%235a3315'/%3E%3Cpath d='M33 27q0-14 17-14t17 14z' fill='%236b3f1c'/%3E%3Ccircle cx='43' cy='52' r='2.6'/%3E%3Ccircle cx='57' cy='52' r='2.6'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body class="locked">
+
+<!-- reusable sunflower glyph -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <radialGradient id="sf-core" cx="50%" cy="45%" r="55%">
+      <stop offset="0" stop-color="#7a4a1c"/><stop offset="1" stop-color="#2b1507"/>
+    </radialGradient>
+    <symbol id="logo" viewBox="0 0 100 100">
+      <circle cx="50" cy="50" r="48" fill="#f6dfb8"/>
+      <circle cx="50" cy="50" r="48" fill="none" stroke="#c98a3a" stroke-width="2" stroke-dasharray="3 4"/>
+      <circle cx="50" cy="15" r="7" fill="none" stroke="#c9a86a" stroke-width="2.6"/>
+      <rect x="31" y="30" width="38" height="56" rx="17" fill="#dba35d"/>
+      <rect x="31" y="46" width="38" height="17" fill="#fff4e0"/>
+      <path d="M31 31 q19 -9 38 0 v5 q-19 6 -38 0z" fill="#dba35d"/>
+      <rect x="31" y="46" width="38" height="17" fill="#fff4e0"/>
+      <ellipse cx="50" cy="27" rx="25" ry="6" fill="#5a3315"/>
+      <path d="M33 27 q0 -14 17 -14 q17 0 17 14z" fill="#6b3f1c"/>
+      <circle cx="43" cy="52" r="2.4" fill="#1a0f0a"/><circle cx="57" cy="52" r="2.4" fill="#1a0f0a"/>
+      <path d="M45 58 q5 4.5 10 0" fill="none" stroke="#1a0f0a" stroke-width="2" stroke-linecap="round"/>
+      <circle cx="39" cy="57" r="3" fill="#f5a3b5" opacity=".8"/><circle cx="61" cy="57" r="3" fill="#f5a3b5" opacity=".8"/>
+    </symbol>
+    <symbol id="sf" viewBox="-50 -50 100 100">
+      <g fill="#ffc61a" stroke="#e8a317" stroke-width="1">
+        <g id="sf-ring">
+          <ellipse cx="0" cy="-32" rx="8" ry="17"/>
+          <ellipse cx="0" cy="-32" rx="8" ry="17" transform="rotate(30)"/>
+          <ellipse cx="0" cy="-32" rx="8" ry="17" transform="rotate(60)"/>
+          <ellipse cx="0" cy="-32" rx="8" ry="17" transform="rotate(90)"/>
+          <ellipse cx="0" cy="-32" rx="8" ry="17" transform="rotate(120)"/>
+          <ellipse cx="0" cy="-32" rx="8" ry="17" transform="rotate(150)"/>
+          <ellipse cx="0" cy="-32" rx="8" ry="17" transform="rotate(180)"/>
+          <ellipse cx="0" cy="-32" rx="8" ry="17" transform="rotate(210)"/>
+          <ellipse cx="0" cy="-32" rx="8" ry="17" transform="rotate(240)"/>
+          <ellipse cx="0" cy="-32" rx="8" ry="17" transform="rotate(270)"/>
+          <ellipse cx="0" cy="-32" rx="8" ry="17" transform="rotate(300)"/>
+          <ellipse cx="0" cy="-32" rx="8" ry="17" transform="rotate(330)"/>
+        </g>
+      </g>
+      <circle r="17" fill="url(#sf-core)"/>
+      <circle r="17" fill="none" stroke="#9c6a2e" stroke-width="1.5" stroke-dasharray="2 3"/>
+    </symbol>
+  </defs>
+</svg>
+
+<canvas id="bg" aria-hidden="true"></canvas>
+<div class="vignette" aria-hidden="true"></div>
+
+<!-- ============ GATE ============ -->
+<div id="gate" role="dialog" aria-label="Welcome">
+  <div class="gate-inner">
+    <div class="gate-charlie"><img src="img/charlie.webp" alt="Charlie, in a hat and moustache, tipping into view"><span class="bubble on">Psst… I have a surprise for you!</span></div>
+    <p class="eyebrow">Your Charlie is waiting</p>
+    <h1 class="script">for <span class="js-name">you</span></h1>
+    <p class="gate-sub">A tiny enchanted universe, built with love.<br>Sound on, if you can. It's worth it.</p>
+    <button class="btn btn-gold" id="enter" data-tip="Open the door ✦">
+      <span>Open the surprise</span>
+      <i class="shine"></i>
+    </button>
+  </div>
+</div>
+
+<!-- ============ HUD ============ -->
+<header class="hud" aria-label="Controls">
+  <div class="hud-brand"><svg aria-hidden="true"><use href="#sf"/></svg><span><span class="js-name">Aiman</span>'s world</span></div>
+  <button class="hud-btn" id="music" aria-pressed="true" aria-label="Toggle music" data-tip="Music on / off">
+    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l11-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="17" cy="16" r="3"/></svg>
+    <i class="slash"></i>
+  </button>
+</header>
+
+<aside class="wishes-hud" id="wishesHud" aria-live="polite">
+  <svg aria-hidden="true"><use href="#sf"/></svg>
+  <div>
+    <b><span id="foundN">0</span> / <span id="foundTotal">9</span></b>
+    <small>wishes found · tap the floating things</small>
+  </div>
+  <div class="bar"><i id="foundBar"></i></div>
+</aside>
+
+<div class="toast" id="toast" role="status" aria-live="polite"><p></p></div>
+<div class="hint" id="hint" aria-hidden="true">✦ a wish is hiding here</div>
+
+<main id="main">
+
+  <!-- ============ HERO ============ -->
+  <section class="sec hero" id="hero">
+    <div class="wrap center">
+      <p class="eyebrow reveal">Your Charlie says</p>
+      <h1 class="hb script reveal">Happy Birthday</h1>
+      <h2 class="name reveal"><span class="js-name">Aiman</span></h2>
+      <p class="lead reveal">A tiny enchanted world, stitched together by hand — just like your sunflowers.</p>
+      <div class="row reveal">
+        <a class="btn btn-gold" href="#why" data-tip="Let's go ✦"><span>Begin the magic</span><i class="shine"></i></a>
+        <button class="btn btn-ghost" id="sparkleMe" data-tip="Go on. Press it."><span>Sprinkle some magic</span></button>
+      </div>
+      <p class="scroll-cue reveal"><span></span> scroll slowly</p>
+    </div>
+    <div class="sticker s-hero reveal" data-lines="Happy birthday, my Penguin!|*tips hat*|You are the sunshine of my circus.|Pssst. Tap the floating things!">
+      <div class="float"><div class="stilt"><img src="img/charlie.webp" alt="Charlie"></div></div>
+      <span class="bubble">Happy birthday, my Penguin!</span>
+    </div>
+  </section>
+
+  <!-- ============ WHY ============ -->
+  <section class="sec" id="why">
+    <div class="wrap">
+      <header class="sec-head reveal">
+        <p class="eyebrow">Why this world exists</p>
+        <h2 class="h2">Three things I know for certain<span class="gold">.</span></h2>
+      </header>
+      <div class="grid3">
+        <article class="card tilt reveal" tabindex="0">
+          <span class="num">01</span>
+          <h3>Always hopeful</h3>
+          <p>You see a door where everyone else sees a wall. Then you quietly hold it open for the rest of us.</p>
+          <i class="glare"></i>
+        </article>
+        <article class="card tilt reveal" tabindex="0">
+          <span class="num">02</span>
+          <h3>Pure sunshine</h3>
+          <p>Around you there is no negative energy. I've checked. Properly. It doesn't exist within a mile of you.</p>
+          <i class="glare"></i>
+        </article>
+        <article class="card tilt reveal" tabindex="0">
+          <span class="num">03</span>
+          <h3>The most beautiful soul</h3>
+          <p>The kind of beautiful that needs no filter, no lighting, no angle. It's in how you treat people. It shows anyway.</p>
+          <i class="glare"></i>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ CHARLIE STORY ============ -->
+  <section class="sec" id="charlie">
+    <div class="wrap">
+      <header class="sec-head reveal">
+        <p class="eyebrow">The origin story</p>
+        <h2 class="h2">Charlie exists because of <span class="script big">you</span><span class="gold">.</span></h2>
+      </header>
+      <div class="story">
+        <div class="polaroids">
+          <figure class="polaroid p1 stilt reveal" style="--r:-4deg">
+            <i class="tape"></i>
+            <img src="img/charlie-photo.jpg" alt="Charlie: a hat, a cane, a painted face and a moustache" loading="lazy">
+            <figcaption class="script">Charlie, fresh from the chair</figcaption>
+          </figure>
+          <figure class="usframe stilt reveal" style="--r:3deg" tabindex="0">
+            <span class="orbit" aria-hidden="true"><i>♡</i><i>✿</i><i>♡</i><i>✦</i><i>♡</i></span>
+            <div class="blob"><img src="img/us.jpg" alt="The two of us, close together in the sunshine" loading="lazy"></div>
+            <span class="tag">bestie era ✿</span>
+            <figcaption class="script">us ♡</figcaption>
+            <span class="bubble">my favourite person ♡</span>
+          </figure>
+        </div>
+        <div class="card story-text reveal">
+          <p class="body" style="margin-top:0">I walked in as me. I walked out as Charlie.</p>
+          <p class="body">You did that, brush by brush, with the same steady, hopeful patience you put into everything you touch. The hat, the moustache, the whole legend: that's your handiwork. And you loved the result, which, coming from the best make-up artist I know, is the only review I needed.</p>
+          <p class="body">So today Charlie is back from retirement, with one job: to make sure you feel as celebrated as you make everyone else feel.</p>
+          <span class="credit">Make-up by <b class="js-name">Aiman</b> ✦</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ GALLERY ============ -->
+  <section class="sec" id="gallery">
+    <div class="wrap">
+      <header class="sec-head reveal">
+        <p class="eyebrow">The portrait gallery</p>
+        <h2 class="h2">You, in your own light<span class="gold">.</span></h2>
+      </header>
+      <div class="frames">
+        <figure class="frame tilt reveal" data-full="img/aiman-1.jpg" data-cap="Lilac, gold and a quiet kind of elegance." tabindex="0" role="button" aria-label="Open photo">
+          <div class="arch"><img src="img/aiman-1.jpg" alt="Portrait in a lilac and gold saree beside pink and blue flowers" loading="lazy"><i class="glare"></i></div>
+          <figcaption><span class="script">Lilac &amp; gold</span><small>tap to open ✦</small></figcaption>
+        </figure>
+        <figure class="frame tilt reveal" data-full="img/aiman-2.jpg" data-cap="Golden light, even after dark." tabindex="0" role="button" aria-label="Open photo">
+          <div class="arch"><img src="img/aiman-2.jpg" alt="Portrait in a peach suit with a cream hijab, lit by a warm golden glow" loading="lazy"><i class="glare"></i></div>
+          <figcaption><span class="script">Golden glow</span><small>tap to open ✦</small></figcaption>
+        </figure>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ CRAFT ============ -->
+  <section class="sec" id="craft">
+    <div class="wrap">
+      <div class="craft-wrap">
+      <div class="sticker s-yarn reveal" data-lines="Stitch by stitch ♡|One more row…|Tea + yarn = peace.">
+        <div class="float"><div class="stilt"><img src="img/girl-yarn.webp" alt="Illustration of a girl crocheting among balls of yarn"></div></div>
+        <span class="bubble">Stitch by stitch ♡</span>
+      </div>
+      <div class="craft card reveal">
+        <p class="eyebrow">Made by hand</p>
+        <h2 class="h2">Hooked on <span class="script big">happiness</span></h2>
+        <p class="body">Every stitch is patience. Every sunflower keychain is proof that you can turn plain thread into something people want to carry everywhere. That is exactly what you do to people, too.</p>
+
+        <div class="swatch-wrap">
+          <p class="mini">Choose a thread for the big sunflower keychain</p>
+          <div class="swatches" id="swatches" role="radiogroup" aria-label="Thread colour">
+            <button class="sw on" role="radio" aria-checked="true" style="--c:#ffc61a" data-c="#ffc61a" data-tip="Sunflower"></button>
+            <button class="sw" role="radio" aria-checked="false" style="--c:#f3a8b8" data-c="#f3a8b8" data-tip="Blush"></button>
+            <button class="sw" role="radio" aria-checked="false" style="--c:#b9a2e0" data-c="#b9a2e0" data-tip="Lilac"></button>
+            <button class="sw" role="radio" aria-checked="false" style="--c:#fbf0d4" data-c="#fbf0d4" data-tip="Cream"></button>
+            <button class="sw" role="radio" aria-checked="false" style="--c:#9fc29a" data-c="#9fc29a" data-tip="Sage"></button>
+          </div>
+        </div>
+
+        <ul class="stats">
+          <li><b data-count="9999" data-suffix="+">0</b><small>sunflowers stitched</small></li>
+          <li><b data-count="0">0</b><small>negative vibes allowed</small></li>
+          <li><b data-count="100" data-suffix="%">0</b><small>pure magic</small></li>
+        </ul>
+      </div>
+      <div class="sticker s-knit reveal" data-lines="Cosy mode: on.|Making something lovely…|Hook, yarn, happy.">
+        <div class="float"><div class="stilt"><img src="img/girl-knit.webp" alt="Illustration of a girl in an orange jumper knitting"></div></div>
+        <span class="bubble">Cosy mode: on.</span>
+      </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ AIM TO CROCHET ============ -->
+  <section class="sec" id="aim">
+    <div class="wrap center">
+      <header class="sec-head reveal">
+        <p class="eyebrow">The little shop of wonders</p>
+        <h2 class="wordmark script"><svg class="logo-mark" aria-hidden="true"><use href="#logo"/></svg>Aim to Crochet</h2>
+        <p class="lead">Tiny stitched treasures. Always here to smile.</p>
+        <span class="handle">@aim_to_crochet</span>
+      </header>
+      <ul class="chips reveal" aria-label="What she makes">
+        <li data-tip="Her signature. Sunny on any head."><svg aria-hidden="true"><use href="#sf"/></svg>Sunflower hair ties</li>
+        <li data-tip="Wear a little sunshine on your arm."><svg aria-hidden="true"><use href="#sf"/></svg>Sunflower wristbands</li>
+        <li data-tip="Yes, with a sunflower flap."><svg aria-hidden="true"><use href="#sf"/></svg>Sunflower purses</li>
+        <li data-tip="Little faces that smile back."><span>☺</span>Tiny keychains</li>
+        <li data-tip="Pinterest-inspired. Pinterest should take notes."><span>✿</span>Scrunchies</li>
+        <li data-tip="Cherries, roses, pearls and more."><span>♡</span>Bags &amp; treasures</li>
+      </ul>
+      <div class="work-grid" id="workGrid" hidden></div>
+      <p class="hint-line reveal">Every one of these is hers. Go on, tap the floating ones in the sky.</p>
+    </div>
+  </section>
+
+  <!-- ============ WISH / CAKE ============ -->
+  <section class="sec" id="wish">
+    <div class="wrap center">
+      <header class="sec-head reveal">
+        <p class="eyebrow">Your moment</p>
+        <h2 class="h2">Make a wish<span class="gold">.</span></h2>
+      </header>
+
+      <div class="cake reveal" id="cake">
+        <svg viewBox="0 0 300 330" role="img" aria-label="A birthday cake with a sunflower on top and a lit candle">
+          <defs>
+            <linearGradient id="g-flame" x1="0" y1="1" x2="0" y2="0">
+              <stop offset="0" stop-color="#ff9a1f"/><stop offset=".6" stop-color="#ffd24a"/><stop offset="1" stop-color="#fff6c8"/>
+            </linearGradient>
+            <linearGradient id="g-cream" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="#fff7ea"/><stop offset="1" stop-color="#f1dfc0"/>
+            </linearGradient>
+            <linearGradient id="g-blush" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="#f8cfd8"/><stop offset="1" stop-color="#eba6b6"/>
+            </linearGradient>
+            <radialGradient id="g-halo"><stop offset="0" stop-color="#ffd98a" stop-opacity=".7"/><stop offset="1" stop-color="#ffd98a" stop-opacity="0"/></radialGradient>
+          </defs>
+          <ellipse cx="150" cy="306" rx="130" ry="14" fill="#000" opacity=".28"/>
+          <ellipse cx="150" cy="298" rx="125" ry="14" fill="#e8c07a"/>
+          <ellipse cx="150" cy="294" rx="125" ry="14" fill="#f6e0a8"/>
+          <!-- bottom tier -->
+          <rect x="45" y="212" width="210" height="80" rx="14" fill="url(#g-cream)"/>
+          <path d="M45 226 q15 20 30 0 t30 0 t30 0 t30 0 t30 0 t30 0 t30 0 v-14 h-210z" fill="#fff" opacity=".85"/>
+          <path d="M60 262 h180" stroke="#e8c07a" stroke-width="3" stroke-dasharray="2 7" stroke-linecap="round"/>
+          <!-- top tier -->
+          <rect x="85" y="150" width="130" height="66" rx="12" fill="url(#g-blush)"/>
+          <path d="M85 162 q11 18 22 0 t22 0 t22 0 t22 0 t22 0 t22 0 v-12 h-132z" fill="#fff" opacity=".9"/>
+          <path d="M98 196 h104" stroke="#fff" stroke-width="3" stroke-dasharray="2 7" stroke-linecap="round" opacity=".9"/>
+          <!-- sprinkles -->
+          <g stroke-linecap="round" stroke-width="3">
+            <path d="M70 240 l5 -3" stroke="#f3a8b8"/><path d="M110 248 l5 3" stroke="#b9a2e0"/><path d="M150 242 l5 -3" stroke="#ffc61a"/>
+            <path d="M190 250 l5 3" stroke="#9fc29a"/><path d="M225 240 l4 -4" stroke="#f3a8b8"/>
+          </g>
+          <!-- sunflower topper -->
+          <g transform="translate(86 146) scale(.42)"><use href="#sf" x="-50" y="-50" width="100" height="100"/></g>
+          <g transform="translate(214 146) scale(.42)"><use href="#sf" x="-50" y="-50" width="100" height="100"/></g>
+          <!-- candle -->
+          <rect x="143" y="104" width="14" height="48" rx="3" fill="#f6e0a8"/>
+          <path d="M143 118 l14 -6 M143 130 l14 -6 M143 142 l14 -6" stroke="#e8a317" stroke-width="3"/>
+          <rect x="149" y="98" width="2" height="8" fill="#3a2a1a"/>
+          <g id="flame">
+            <circle class="halo" cx="150" cy="82" r="46" fill="url(#g-halo)"/>
+            <path class="fl" d="M150 62 C 140 78 138 92 150 98 C 162 92 160 78 150 62Z" fill="url(#g-flame)"/>
+          </g>
+          <g id="smoke" opacity="0">
+            <path d="M150 92 C 140 76 160 64 148 46 C 142 36 154 26 150 14" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" opacity=".6"/>
+          </g>
+        </svg>
+        <div class="cake-glow" aria-hidden="true"></div>
+        <div class="sticker s-cake" data-lines="Go on, blow! I'll look away.|Make it a big one.|Whatever you wish: I'm in.">
+          <div class="float"><div class="stilt"><img src="img/charlie.webp" alt="Charlie"></div></div>
+          <span class="bubble">Go on, blow! I'll look away.</span>
+        </div>
+      </div>
+
+      <div class="row reveal">
+        <button class="btn btn-gold" id="blow" data-tip="Close your eyes first ✦"><span>Blow out the candle</span><i class="shine"></i></button>
+      </div>
+      <p class="wish-msg" id="wishMsg" aria-live="polite"></p>
+    </div>
+  </section>
+
+  <!-- ============ LETTER ============ -->
+  <section class="sec" id="letter">
+    <div class="wrap center">
+      <header class="sec-head reveal">
+        <p class="eyebrow">One more thing</p>
+        <h2 class="h2">A letter, just for you<span class="gold">.</span></h2>
+      </header>
+
+      <button class="envelope reveal" id="envelope" aria-expanded="false" aria-controls="paper" data-tip="Open it ✦">
+        <span class="env-back"></span>
+        <span class="env-flap"></span>
+        <span class="env-front"></span>
+        <span class="env-seal"><svg aria-hidden="true"><use href="#sf"/></svg></span>
+        <span class="env-label">Tap to open</span>
+      </button>
+
+      <article class="paper" id="paper" hidden>
+        <div class="paper-pic" aria-hidden="true"><img src="img/us.jpg" alt=""><span>♡</span></div>
+        <p class="script salute">Dear <span class="js-name">Aiman</span>, my Penguin,</p>
+        <p>I tried to work out how to put you into words, and the honest answer is: I can't. So I built you a world instead.</p>
+        <p>You are the most hopeful person I know. Not the loud, forced kind of hopeful. The real kind, where you walk into a bad day and quietly make it better. In all the time I've known you, I have never once felt negative energy around you. Not once. Whatever you carry, it clears the room.</p>
+        <p>And you are, without any competition, the most beautiful human being I have ever met. Inside first, which is exactly why it shows on the outside too.</p>
+        <p>Keep making your sunflowers. Keep being the reason people feel lighter. Today the universe owes you everything it has got.</p>
+        <p class="script sign">Happy Birthday, my Penguin.</p>
+        <p class="from">— <span class="js-from">Syeda, your Charlie</span></p>
+        <p class="ps">P.S. The first keychain of the next batch is mine. No negotiation.</p>
+        <p class="ps" style="margin-top:.6rem;padding-top:0;border:0">P.P.S. Thank you for turning me into Charlie. Best make-up artist in the world.</p>
+      </article>
+    </div>
+  </section>
+
+  <!-- ============ FOOTER ============ -->
+  <footer class="sec foot" id="end">
+    <div class="wrap center">
+      
+      <h2 class="script end-title">Happy Birthday, <span class="js-name">Aiman</span></h2>
+      <p class="lead">May this year be as warm, bright and kind as you are, my Penguin.</p>
+      <div class="row">
+        <button class="btn btn-gold" id="rain" data-tip="Brace yourself ✦"><span>Make it rain sunflowers</span><i class="shine"></i></button>
+        <button class="btn btn-ghost" id="replay" data-tip="Back to the start"><span>Replay the magic</span></button>
+      </div>
+      <p class="bow-cap" id="bowCap" aria-live="polite">*tips hat* With the deepest respect, my Penguin. ♥</p>
+      <p class="made">Made with love, thread and a lot of sparkle.</p>
+    </div>
+  </footer>
+</main>
+
+<!-- ============ LIGHTBOX ============ -->
+<div class="lightbox" id="lightbox" hidden>
+  <button class="lb-close" id="lbClose" aria-label="Close">✕</button>
+  <figure>
+    <img id="lbImg" alt="">
+    <figcaption id="lbCap" class="script"></figcaption>
+  </figure>
+</div>
+
+<noscript><p style="position:fixed;inset:auto 0 0;padding:12px;text-align:center;background:#1a0d33;color:#f6e0a8">This birthday world needs JavaScript. Happy Birthday anyway ✦</p></noscript>
+
+<script src="app.js"></script>
+<script src="assets.js"></script>
+<script src="vendor/three.min.js"></script>
+<script src="scene.js"></script>
+</body>
+</html>

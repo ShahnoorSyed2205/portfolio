@@ -1,0 +1,268 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Happy Birthday ✦ The Gentleman's Garage</title>
+<meta name="description" content="A private birthday unveiling, built with admiration.">
+<meta name="theme-color" content="#060508">
+<meta name="robots" content="noindex,nofollow">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Great+Vibes&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='46' fill='%23080709' stroke='%23d4a548' stroke-width='6'/%3E%3Ccircle cx='50' cy='50' r='12' fill='%23d4a548'/%3E%3Cpath d='M8 50h30M62 50h30M50 62v30' stroke='%23d4a548' stroke-width='7'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body class="locked">
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <linearGradient id="goldg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f6e3b0"/><stop offset=".5" stop-color="#d4a548"/><stop offset="1" stop-color="#8d6a24"/></linearGradient>
+    <symbol id="wheel" viewBox="0 0 100 100">
+      <circle cx="50" cy="50" r="42" fill="none" stroke="url(#goldg)" stroke-width="9"/>
+      <circle cx="50" cy="50" r="42" fill="none" stroke="#0a0809" stroke-width="2" opacity=".5"/>
+      <path d="M10 52 Q50 62 90 52" fill="none" stroke="url(#goldg)" stroke-width="8" stroke-linecap="round"/>
+      <path d="M50 56 V92" stroke="url(#goldg)" stroke-width="8" stroke-linecap="round"/>
+      <circle cx="50" cy="50" r="12" fill="#0a0809" stroke="url(#goldg)" stroke-width="4"/>
+      <circle cx="50" cy="50" r="4" fill="url(#goldg)"/>
+    </symbol>
+    <symbol id="watch" viewBox="0 0 100 100">
+      <circle cx="50" cy="50" r="36" fill="#0a0809" stroke="url(#goldg)" stroke-width="7"/>
+      <path d="M50 22v6M50 72v6M22 50h6M72 50h6" stroke="url(#goldg)" stroke-width="4" stroke-linecap="round"/>
+      <path d="M50 50V34M50 50l12 8" stroke="url(#goldg)" stroke-width="4" stroke-linecap="round"/>
+      <rect x="40" y="4" width="20" height="14" rx="4" fill="url(#goldg)"/><rect x="40" y="82" width="20" height="14" rx="4" fill="url(#goldg)"/>
+    </symbol>
+    <symbol id="glasses" viewBox="0 0 100 100">
+      <path d="M8 40 Q30 36 46 42 Q44 66 28 70 Q10 68 8 40Z M92 40 Q70 36 54 42 Q56 66 72 70 Q90 68 92 40Z" fill="#0a0809" stroke="url(#goldg)" stroke-width="5" stroke-linejoin="round"/>
+      <path d="M46 42 Q50 36 54 42" fill="none" stroke="url(#goldg)" stroke-width="4"/>
+    </symbol>
+    <symbol id="flame" viewBox="0 0 100 100">
+      <rect x="30" y="52" width="40" height="42" rx="7" fill="#0a0809" stroke="url(#goldg)" stroke-width="5"/>
+      <path d="M50 8 C40 24 38 34 50 46 C62 34 60 24 50 8Z" fill="url(#goldg)"/>
+    </symbol>
+    <symbol id="key" viewBox="0 0 100 100">
+      <rect x="26" y="8" width="48" height="84" rx="24" fill="#0a0809" stroke="url(#goldg)" stroke-width="5"/>
+      <path d="M50 24v12M40 40h20M44 56h12v12H44z" fill="none" stroke="url(#goldg)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+    </symbol>
+  </defs>
+</svg>
+
+<canvas id="bg" aria-hidden="true"></canvas>
+<div class="vignette" aria-hidden="true"></div>
+<div class="flash" id="flash" aria-hidden="true"></div>
+
+<!-- ============ GATE: key fob ============ -->
+<div id="gate" role="dialog" aria-label="Welcome">
+  <div class="gate-inner">
+    <p class="eyebrow">A private unveiling</p>
+    <h1 class="gate-title script">for <span class="js-name">him</span></h1>
+    <button class="fob" id="enter" aria-label="Unlock the car">
+      <span class="fob-ring"></span>
+      <svg aria-hidden="true"><use href="#key"/></svg>
+      <b>Unlock</b>
+    </button>
+    <p class="gate-sub">Sound on. Take your time.</p>
+  </div>
+</div>
+
+<!-- ============ HUD ============ -->
+<header class="hud" aria-label="Controls">
+  <div class="hud-brand"><span class="mono">S</span><span class="hud-name"><span class="js-name">Mr. Khan</span>'s garage</span></div>
+  <button class="hud-btn" id="music" aria-pressed="true" aria-label="Toggle music" data-tip="Music on / off">
+    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l11-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="17" cy="16" r="3"/></svg>
+    <i class="slash"></i>
+  </button>
+</header>
+
+<aside class="wishes-hud" id="wishesHud" aria-live="polite">
+  <svg aria-hidden="true"><use href="#watch"/></svg>
+  <div><b><span id="foundN">0</span> / <span id="foundTotal">9</span></b><small>wishes found · tap the objects</small></div>
+  <div class="bar"><i id="foundBar"></i></div>
+</aside>
+
+<div class="toast" id="toast" role="status" aria-live="polite"><p></p></div>
+<div class="hint" id="hint" aria-hidden="true">✦ a wish is hiding here</div>
+
+<main id="main">
+
+  <!-- ============ HERO ============ -->
+  <section class="sec hero" id="hero">
+    <div class="wrap center">
+      <p class="eyebrow reveal">Today belongs to</p>
+      <h1 class="hb script reveal">Happy Birthday</h1>
+      <h2 class="name reveal"><span class="js-name">Mr. Khan</span></h2>
+      <p class="lead reveal">To the man who made me believe a true gentleman exists.</p>
+      <div class="row reveal">
+        <a class="btn btn-gold" href="#gentleman" data-tip="Let's go ✦"><span>Begin the drive</span><i class="shine"></i></a>
+        <button class="btn btn-ghost" id="flashBtn" data-tip="Lights, please"><span>Flash the headlights</span></button>
+      </div>
+      <p class="scroll-cue reveal"><span></span> scroll slowly</p>
+    </div>
+  </section>
+
+  <!-- ============ THE GENTLEMAN ============ -->
+  <section class="sec" id="gentleman">
+    <div class="wrap">
+      <header class="sec-head reveal">
+        <p class="eyebrow">What I know for certain</p>
+        <h2 class="h2">Three things that make a gentleman<span class="gold">.</span></h2>
+      </header>
+      <div class="grid3">
+        <article class="card tilt reveal" tabindex="0"><span class="num">I</span><h3>Elegance</h3>
+          <p>You never try to be the most impressive man in the room. That is exactly why you are.</p><i class="glare"></i></article>
+        <article class="card tilt reveal" tabindex="0"><span class="num">II</span><h3>Intelligence</h3>
+          <p>Quiet, sharp, always a few moves ahead. The kind of mind that makes silence feel safe.</p><i class="glare"></i></article>
+        <article class="card tilt reveal" tabindex="0"><span class="num">III</span><h3>Integrity</h3>
+          <p>You showed me what respect looks like when nobody is watching. I have never forgotten it.</p><i class="glare"></i></article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ PORTRAITS ============ -->
+  <section class="sec" id="portraits">
+    <div class="wrap">
+      <header class="sec-head reveal">
+        <p class="eyebrow">The portrait gallery</p>
+        <h2 class="h2">The man himself<span class="gold">.</span></h2>
+      </header>
+      <div class="gallery" id="gallery"></div>
+    </div>
+  </section>
+
+  <!-- ============ GARAGE (scroll-driven) ============ -->
+  <section class="garage" id="garage">
+    <div class="garage-stick">
+      <header class="g-head">
+        <p class="eyebrow">The garage</p>
+        <h2 class="h2">Five ways to arrive<span class="gold">.</span></h2>
+      </header>
+      <div class="g-card" id="gCard">
+        <span class="g-num" id="gNum">01 / 05</span>
+        <img class="g-photo" id="gPhoto" alt="" hidden>
+        <h3 id="gName">BMW</h3>
+        <p id="gLine"></p>
+        <ul class="g-chips" id="gChips"></ul>
+      </div>
+      <div class="g-nav">
+        <button class="g-btn" id="gPrev" aria-label="Previous car">‹</button>
+        <div class="g-dots" id="gDots"></div>
+        <button class="g-btn" id="gNext" aria-label="Next car">›</button>
+      </div>
+      <p class="g-hint">scroll or tap to change car · tap the car to hear it</p>
+    </div>
+  </section>
+
+  <!-- ============ ENGINE ============ -->
+  <section class="sec" id="engine">
+    <div class="wrap center">
+      <header class="sec-head reveal">
+        <p class="eyebrow">One more thing</p>
+        <h2 class="h2">Start the engine<span class="gold">.</span></h2>
+      </header>
+      <div class="gauge reveal" id="gauge" aria-hidden="true">
+        <svg viewBox="0 0 200 200">
+          <defs><radialGradient id="gbg" cx="50%" cy="45%" r="60%"><stop offset="0" stop-color="#1a1410"/><stop offset="1" stop-color="#050404"/></radialGradient></defs>
+          <circle cx="100" cy="100" r="94" fill="url(#gbg)" stroke="url(#goldg)" stroke-width="6"/>
+          <g id="ticks" stroke="#e8cf94" stroke-linecap="round"></g>
+          <text x="100" y="140" text-anchor="middle" font-family="Cinzel,serif" font-size="11" fill="#c9a45c" letter-spacing="3">RPM ×1000</text>
+          <g id="needle" style="transform-origin:100px 100px;transform:rotate(-135deg)"><path d="M100 100 L98 38 L100 30 L102 38Z" fill="#ff5a3c"/><circle cx="100" cy="100" r="8" fill="url(#goldg)"/></g>
+        </svg>
+      </div>
+      <div class="row reveal">
+        <button class="btn btn-gold" id="start" data-tip="Close your eyes. Listen."><span>Start the engine</span><i class="shine"></i></button>
+        <button class="btn btn-ghost" id="rev" disabled><span>Rev it</span></button>
+      </div>
+      <p class="wish-msg" id="wishMsg" aria-live="polite"></p>
+    </div>
+  </section>
+
+  <!-- ============ COLLECTION ============ -->
+  <section class="sec collection" id="collection">
+    <div class="wrap">
+      <header class="sec-head reveal center">
+        <p class="eyebrow">The details</p>
+        <h2 class="h2">A man is what he chooses to carry<span class="gold">.</span></h2>
+      </header>
+      <div class="col-spacer"></div>
+      <div class="grid3">
+        <article class="card tilt reveal" tabindex="0"><svg class="ico"><use href="#watch"/></svg><h3>Timepieces</h3>
+          <p>He wears time like a statement. Never loud, never late.</p><i class="glare"></i></article>
+        <article class="card tilt reveal" tabindex="0"><svg class="ico"><use href="#glasses"/></svg><h3>Aviators</h3>
+          <p>Gold frames, dark lenses. The sun never stood a chance.</p><i class="glare"></i></article>
+        <article class="card tilt reveal" tabindex="0"><svg class="ico"><use href="#flame"/></svg><h3>Rituals</h3>
+          <p>A gold lighter, Gold Leaf and Marlboro, and the slow evenings that come with them.</p><i class="glare"></i></article>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec" id="icons" hidden>
+    <div class="wrap">
+      <header class="sec-head reveal center">
+        <p class="eyebrow">Objects of desire</p>
+        <h2 class="h2">The finer things<span class="gold">.</span></h2>
+      </header>
+      <div class="gallery gallery-extra" id="iconGrid"></div>
+    </div>
+  </section>
+
+  <!-- ============ ARMOURY / EXTRA PHOTOS (appear when images exist) ============ -->
+  <section class="sec" id="extra" hidden>
+    <div class="wrap">
+      <header class="sec-head reveal center">
+        <p class="eyebrow">The private collection</p>
+        <h2 class="h2">What he is proud of<span class="gold">.</span></h2>
+      </header>
+      <div class="gallery gallery-extra" id="extraGrid"></div>
+    </div>
+  </section>
+
+  <!-- ============ LETTER ============ -->
+  <section class="sec" id="letter">
+    <div class="wrap center">
+      <header class="sec-head reveal">
+        <p class="eyebrow">Last page</p>
+        <h2 class="h2">A letter, just for you<span class="gold">.</span></h2>
+      </header>
+      <button class="envelope reveal" id="envelope" aria-expanded="false" aria-controls="paper" data-tip="Open it ✦">
+        <span class="env-back"></span><span class="env-flap"></span><span class="env-front"></span>
+        <span class="env-seal"><svg aria-hidden="true"><use href="#wheel"/></svg></span>
+        <span class="env-label">Tap to open</span>
+      </button>
+      <article class="paper" id="paper" hidden>
+        <p class="script salute">Dear <span class="js-nick">Pathaan</span>,</p>
+        <p>I grew up believing a man was someone who leaves, someone who is not there when it matters. Then you came along and quietly rewrote everything I thought I knew. You showed me that a man can be steady, kind, intelligent and present. You showed me that a man can be a whole world.</p>
+        <p>You are the man who made me believe a true gentleman exists. Elegant without trying, sharp without announcing it, and gentle in the ways that actually count. You are the first man I loved the most, and you will always be my last. That does not need to change anything for you. It is simply true, and I wanted you to know it.</p>
+        <p>I do not know what the future holds. We did not get our forever, and I have made my peace with that. So if this birthday turns out to be our last moment together, I want it to be a beautiful one, and I want the last thing I ever gave you to be pure admiration, with nothing asked in return.</p>
+        <p>May every road ahead be smooth and every sky stay clear. May every engine start first time. May the people around you deserve you, and may every room you walk into feel a little warmer for it.</p>
+        <p class="script sign">Happy Birthday, with all my love and respect.</p>
+        <p class="from">— <span class="js-from">Syeda</span></p>
+      </article>
+    </div>
+  </section>
+
+  <!-- ============ FINALE ============ -->
+  <footer class="sec foot" id="end">
+    <div class="wrap center">
+      <h2 class="script end-title">Happy Birthday, <span class="js-name">Mr. Khan</span></h2>
+      <p class="lead">Drive safe. Shine on. Never stop being you.</p>
+      <div class="row">
+        <button class="btn btn-gold" id="rain" data-tip="Brace yourself ✦"><span>Make it rain gold</span><i class="shine"></i></button>
+        <button class="btn btn-ghost" id="replay" data-tip="Back to the start"><span>Replay the drive</span></button>
+      </div>
+      <p class="made">Made with admiration, by hand.</p>
+    </div>
+  </footer>
+</main>
+
+<div class="lightbox" id="lightbox" hidden>
+  <button class="lb-close" id="lbClose" aria-label="Close">✕</button>
+  <figure><img id="lbImg" alt=""><figcaption id="lbCap" class="script"></figcaption></figure>
+</div>
+
+<noscript><p style="position:fixed;inset:auto 0 0;padding:12px;text-align:center;background:#060508;color:#e8cf94">This unveiling needs JavaScript. Happy Birthday anyway ✦</p></noscript>
+
+<script src="app.js"></script>
+<script src="vendor/three.min.js"></script>
+<script src="scene.js"></script>
+</body>
+</html>
