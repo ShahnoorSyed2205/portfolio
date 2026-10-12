@@ -24,8 +24,8 @@
     ],
     cars: [                  // garage stops, in scroll order (matches the 3D scene)
       { name: 'BMW', line: 'Precision, presence and a quiet kind of power.', chips: ['Sport coupé', 'Twin-turbo', 'Pure poise'] },
-      { name: 'Toyota Hilux', line: 'The latest model. Built to carry whatever life puts on it.', chips: ['Latest model', '4×4', 'Unstoppable'] },
-      { name: 'Honda Civic RS', line: 'Sharp, quick and honest, just like the man who drives it.', chips: ['RS', 'Turbo', 'Daily thrill'] },
+      { photo: 'img/cars/hilux.jpg', name: 'Toyota Hilux', line: 'The latest model. Built to carry whatever life puts on it.', chips: ['Latest model', '4×4', 'Unstoppable'] },
+      { photo: 'img/cars/civic.jpg', name: 'Honda Civic RS', line: 'Sharp, quick and honest, just like the man who drives it.', chips: ['RS', 'Turbo', 'Daily thrill'] },
       { name: 'The Collector\'s Classic', line: 'For the billionaire in him: a vintage beauty that only improves with age.', chips: ['Vintage', 'Hand-built', 'Timeless'] },
       { name: 'F-22 Raptor', line: 'The sky is not the limit. For a pilot at heart, it is home.', chips: ['Air dominance', 'Stealth', 'Pilot at heart'] }
     ],
@@ -36,7 +36,10 @@
       ['watch.jpg', 'Time well kept', 'elegance, down to the wrist'],
       ['levis.jpg', 'Always composed', 'calm in every room']
     ],
-    extra: []                // more photos: [['armoury/file.jpg', 'Title', 'hover line']] in img/
+    extra: [
+      ['armoury/rifles.jpg', 'The rifles', 'a collector\'s eye', true],
+      ['armoury/glock.jpg', 'Glock 34', 'precision, boxed and kept']
+    ]                        // more photos: [['armoury/file.jpg', 'Title', 'hover line']] in img/
   };
 
   var $ = function (s, r) { return (r || document).querySelector(s); };
@@ -291,10 +294,12 @@
     var c = CONFIG.cars[i]; gCard.classList.add('swap');
     setTimeout(function () {
       $('#gNum').textContent = ('0' + (i + 1)).slice(-2) + ' / ' + ('0' + N).slice(-2); $('#gName').textContent = c.name; $('#gLine').textContent = c.line;
+      var ph = $('#gPhoto'); if (c.photo) { ph.src = c.photo; ph.alt = c.name; ph.hidden = false; } else { ph.hidden = true; ph.removeAttribute('src'); }
       $('#gChips').innerHTML = c.chips.map(function (x) { return '<li>' + x + '</li>'; }).join(''); gCard.classList.remove('swap');
     }, 220);
     $$('#gDots i').forEach(function (e, k) { e.classList.toggle('on', k === i); });
   }
+  $('#gPhoto').addEventListener('click', function (e) { var p = e.currentTarget; if (p.src) openLb(p.src, p.alt, p.alt); });
   MAGIC.onCar = showCar; showCar(0);
   function goCar(i) {
     i = Math.max(0, Math.min(N - 1, i));

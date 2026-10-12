@@ -263,3 +263,6 @@ html.has-cursor,html.has-cursor *{cursor:none!important}
 @media (max-width:520px){.gallery{grid-template-columns:1fr}.gframe:nth-child(2n){margin-top:0}}
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
 .no-webgl #bg{background:radial-gradient(80% 60% at 50% 40%,#2a1a0c,#060508)}
+
+.g-photo{display:block;width:100%;height:120px;object-fit:cover;margin:10px 0 4px;border:1px solid var(--line);cursor:pointer}
+.g-photo[hidden]{display:none}
