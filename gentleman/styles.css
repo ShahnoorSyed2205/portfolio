@@ -265,3 +265,6 @@ body.locked .hero .reveal{opacity:0}
 .g-photo[hidden]{display:none}
 
 @media (max-width:860px){ .hero .wrap{background:radial-gradient(ellipse at 50% 45%,rgba(5,4,7,.78),rgba(5,4,7,0) 72%)} .lead{text-shadow:0 2px 14px #000} }
+
+body.locked .hud,body.locked #main{pointer-events:none}
+.wishes-hud{pointer-events:none}

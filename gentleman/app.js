@@ -167,7 +167,7 @@
     }
     function startSynth() {
       if (synthOn || !ctx) return; synthOn = true; nextBar = ctx.currentTime + .2;
-      (function tick() { if (ctx && nextBar < ctx.currentTime + 1.5) { scheduleBar(nextBar); nextBar += BEAT * 4; } setTimeout(tick, 300); })();
+      (function tick() { if (ctx && nextBar < ctx.currentTime + 1.5) { if (enabled) scheduleBar(nextBar); nextBar += BEAT * 4; } setTimeout(tick, 300); })();
     }
 
     /* --- sound effects --- */
@@ -264,7 +264,9 @@
      ============================================================ */
   var flashEl = $('#flash');
   MAGIC.flashScreen = function () { flashEl.classList.add('on'); setTimeout(function () { flashEl.classList.remove('on'); }, 130); };
+  var entering = false;
   $('#enter').addEventListener('click', function () {
+    if (entering) return; entering = true; MAGIC.wantEnter = true;
     Sound.start(); Sound.chirp();
     setTimeout(Sound.thunk, 1000); setTimeout(Sound.doorOpen, 1200);
     MAGIC.enter();

@@ -447,7 +447,7 @@
   }
   function place(key, obj, st, rotY, mirror) {
     obj.position.set(st.x, .16, st.z); obj.rotation.y = rotY || 0; scene.add(obj); cars[key] = obj;
-    if (mirror && !small) { var m = obj.clone(true); m.scale.y = -1; m.position.y = -.16; scene.add(m); mirrors.push({ src: obj, m: m }); }
+    if (mirror && !small) { var m = obj.clone(true); var dead = []; m.traverse(function (n) { if (n.isLight) dead.push(n); }); dead.forEach(function (n) { if (n.parent) n.parent.remove(n); }); m.scale.y = -1; m.position.y = -.16; scene.add(m); mirrors.push({ src: obj, m: m }); }
   }
   // cars
   var bmw = buildCar(SPECS.bmw), hilux = buildCar(SPECS.hilux), civic = buildCar(SPECS.civic), antique = buildAntique(), raptor = buildRaptor();
@@ -581,7 +581,8 @@
     outP.lerpVectors(a.pose.p, b.pose.p, t); outL.lerpVectors(a.pose.l, b.pose.l, t);
   }
 
-  function resize() { var w = innerWidth, h = innerHeight; renderer.setSize(w, h, false); camera.aspect = w / h; camera.fov = w / h < .8 ? 58 : 46; camera.updateProjectionMatrix(); computeKeys(); }
+  var rw = 0, rh = 0;
+  function resize() { var w = innerWidth, h = innerHeight; if (rw && w === rw && Math.abs(h - rh) < 120) return; rw = w; rh = h; renderer.setSize(w, h, false); camera.aspect = w / h; camera.fov = w / h < .8 ? 58 : 46; camera.updateProjectionMatrix(); computeKeys(); }
   addEventListener('resize', resize); addEventListener('load', function () { computeKeys(); }); resize();
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(computeKeys);
   setTimeout(computeKeys, 1500); setTimeout(computeKeys, 4000);
@@ -596,10 +597,11 @@
   function w2s(x, y, d) { var v = new T.Vector3(x / innerWidth * 2 - 1, -(y / innerHeight) * 2 + 1, .5).unproject(camera); return camera.position.clone().add(v.sub(camera.position).normalize().multiplyScalar(d)); }
   var drag = null, spinOff = 0, spinVel = 0, hoverEv = null, hoverQ = false;
   addEventListener('pointerdown', function (e) { if (e.pointerType === 'mouse' && !(e.target.closest && e.target.closest(INTERACTIVE)) && document.body.classList.contains('entered')) drag = { x: e.clientX }; });
-  addEventListener('pointerup', function () { drag = null; });
+  var dragDist = 0;
+  addEventListener('pointerup', function () { dragDist = drag ? (drag.moved || 0) : 0; drag = null; });
   addEventListener('pointermove', function (e) {
     mouse.x = e.clientX / innerWidth * 2 - 1; mouse.y = e.clientY / innerHeight * 2 - 1;
-    if (drag) { var dx = e.clientX - drag.x; drag.x = e.clientX; spinVel = dx * .012; spinOff += dx * .012; }
+    if (drag) { var dx = e.clientX - drag.x; drag.x = e.clientX; drag.moved = (drag.moved || 0) + Math.abs(dx); spinVel = dx * .012; spinOff += dx * .012; }
     if (e.pointerType === 'touch' || !document.body.classList.contains('entered')) return;
     if (e.target.closest && e.target.closest(INTERACTIVE)) { setHover(null); return; }
     hoverEv = e; if (!hoverQ) { hoverQ = true; requestAnimationFrame(function () { hoverQ = false; var h = pick(hoverEv.clientX, hoverEv.clientY); setHover(h ? h.object.userData.item : null, hoverEv); }); }
@@ -612,7 +614,7 @@
   addEventListener('click', function (e) {
     if (!document.body.classList.contains('entered')) return;
     if (e.target.closest && e.target.closest(INTERACTIVE)) return;
-    if (Math.abs((drag && drag.moved) || 0) > 6) return;
+    if (dragDist > 6) { dragDist = 0; return; }
     var h = pick(e.clientX, e.clientY);
     if (h) { var it = h.object.userData.item; it.pop = 1; found[it.id] = true; burstAt(h.point, 80, 5.5); if (M.onPick) M.onPick(it.id); }
     else {
@@ -626,6 +628,7 @@
   var gate = { t: -1, done: false }, lights = { flash: 0 }, engine = { on: false, t: 0, rev: 0 }, shake = 0;
   M.sparkle = function (x, y, n) { burstAt(w2s(x, y, 12), n || 50, 5); };
   M.enter = function () { if (gate.t < 0) gate.t = 0; };
+  if (M.wantEnter) M.enter();
   M.flashLights = function () { lights.flash = 1.2; };
   M.engineStart = function () { engine.on = true; engine.t = 0; shake = 1; };
   M.rev = function () { engine.rev = 1; shake = .7; };
