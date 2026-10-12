@@ -624,6 +624,83 @@
     }
   });
 
+
+  /* ============================================================
+     FINALE GUARD OF HONOUR: two bodyguards behind his car, rifles held low,
+     hat swept off to the chest and a deep respectful bow.
+     ============================================================ */
+  var guards = [], gGroup = new T.Group(); scene.add(gGroup); gGroup.position.set(0, 0, -111); gGroup.scale.setScalar(.74);
+  var G_Y = new T.Vector3(0, 1, 0), g_d = new T.Vector3();
+  function gSeg(m, a, b) { g_d.subVectors(b, a); var l = g_d.length(); m.position.copy(a).addScaledVector(g_d, .5); m.scale.set(1, l, 1); m.quaternion.setFromUnitVectors(G_Y, g_d.normalize()); }
+  function gSolve(arm, S, Tg, bend) {
+    var L1 = arm.L1, L2 = arm.L2, dir = Tg.clone().sub(S), dist = Math.min(dir.length(), L1 + L2 - .002); dir.normalize();
+    var a = (L1 * L1 - L2 * L2 + dist * dist) / (2 * dist), h = Math.sqrt(Math.max(0, L1 * L1 - a * a));
+    var perp = bend.clone().addScaledVector(dir, -bend.dot(dir)).normalize();
+    var E = S.clone().addScaledVector(dir, a).addScaledVector(perp, h), H = S.clone().addScaledVector(dir, dist);
+    gSeg(arm.upper, S, E); gSeg(arm.lower, E, H); arm.elbow.position.copy(E); arm.hand.position.copy(H);
+  }
+  function makeGuard() {
+    var root = new T.Group(), torso = new T.Group(); torso.position.y = 1.5; root.add(torso);
+    var suit = new T.MeshStandardMaterial({ color: 0x07070a, roughness: .55, metalness: .05 }), skin = new T.MeshStandardMaterial({ color: 0xc89a78, roughness: .6 });
+    var white = new T.MeshStandardMaterial({ color: 0xf1ede6, roughness: .5 }), blk = new T.MeshStandardMaterial({ color: 0x0b0b0e, roughness: .25, metalness: .5 });
+    [-1, 1].forEach(function (d) {
+      var leg = new T.Mesh(new T.CylinderGeometry(.17, .14, 1.4, 14), suit); leg.position.set(d * .25, .78, 0); root.add(leg);
+      var shoe = new T.Mesh(new T.BoxGeometry(.36, .17, .66), blk); shoe.position.set(d * .25, .09, .12); root.add(shoe);
+    });
+    var tm = new T.Mesh(new T.CylinderGeometry(.5, .44, 1.35, 20), suit); tm.scale.z = .66; tm.position.y = .68; torso.add(tm);
+    var shirt = new T.Mesh(new T.BoxGeometry(.28, .5, .05), white); shirt.position.set(0, 1.0, .34); torso.add(shirt);
+    var tie = new T.Mesh(new T.BoxGeometry(.07, .45, .06), blk); tie.position.set(0, .95, .375); torso.add(tie);
+    var head = new T.Group(); head.position.set(0, 1.8, .02); torso.add(head);
+    var neck = new T.Mesh(new T.CylinderGeometry(.12, .14, .3, 12), skin); neck.position.set(0, 1.5, 0); torso.add(neck);
+    var face = new T.Mesh(new T.SphereGeometry(.4, 24, 18), skin); face.scale.set(.92, 1.08, .95); head.add(face);
+    var hair = new T.Mesh(new T.SphereGeometry(.42, 22, 12, 0, Math.PI * 2, 0, Math.PI * .46), blk); hair.rotation.x = -.35; hair.position.set(0, .04, -.05); head.add(hair);
+    var gl = new T.Mesh(new T.BoxGeometry(.6, .13, .06), blk); gl.position.set(0, .06, .37); head.add(gl);
+    var ear = new T.Mesh(new T.BoxGeometry(.04, .12, .05), new T.MeshBasicMaterial({ color: 0x55e6ff, toneMapped: false })); ear.position.set(.4, -.02, .06); head.add(ear);
+    function arm() {
+      var up = new T.Mesh(new T.CylinderGeometry(.095, .095, 1, 10), suit), lo = new T.Mesh(new T.CylinderGeometry(.085, .085, 1, 10), suit);
+      var el = new T.Mesh(new T.SphereGeometry(.11, 10, 8), suit), ha = new T.Mesh(new T.SphereGeometry(.115, 12, 10), skin), sh = new T.Mesh(new T.SphereGeometry(.15, 10, 8), suit);
+      torso.add(up, lo, el, ha, sh); return { upper: up, lower: lo, elbow: el, hand: ha, shoulder: sh, L1: .7, L2: .72 };
+    }
+    var aR = arm(), aL = arm(); aR.shoulder.position.set(.52, 1.17, 0); aL.shoulder.position.set(-.52, 1.17, 0);
+    // rifle held low-ready in the left hand (muzzle down, finger off trigger)
+    var rifle = new T.Group();
+    var gm = new T.MeshStandardMaterial({ color: 0x3a3d46, roughness: .35, metalness: .75 });
+    var rec = new T.Mesh(new T.BoxGeometry(.1, .16, .62), gm); rifle.add(rec);
+    var brl = new T.Mesh(new T.CylinderGeometry(.03, .03, .7, 10), gm); brl.rotation.x = Math.PI / 2; brl.position.z = .62; rifle.add(brl);
+    var guard = new T.Mesh(new T.BoxGeometry(.11, .12, .4), gm); guard.position.z = .45; rifle.add(guard);
+    var stock = new T.Mesh(new T.BoxGeometry(.09, .2, .4), gm); stock.position.set(0, -.03, -.5); rifle.add(stock);
+    var mag = new T.Mesh(new T.BoxGeometry(.07, .3, .1), gm); mag.position.set(0, -.22, .08); mag.rotation.x = .15; rifle.add(mag);
+    var scope = new T.Mesh(new T.CylinderGeometry(.04, .04, .32, 10), gm); scope.rotation.x = Math.PI / 2; scope.position.set(0, .13, .05); rifle.add(scope);
+    rifle.position.set(-.5, .33, .31); rifle.rotation.x = .9; rifle.scale.setScalar(1.3); torso.add(rifle);
+    var hat = new T.Group(), crown = new T.Mesh(new T.CylinderGeometry(.27, .32, .26, 22), blk); crown.position.y = .13; hat.add(crown);
+    var brim = new T.Mesh(new T.CylinderGeometry(.55, .55, .03, 30), blk); hat.add(brim); torso.add(hat);
+    var g = { root: root, torso: torso, head: head, hat: hat, aR: aR, aL: aL }; gGroup.add(root); guards.push(g); return g;
+  }
+  var gA = makeGuard(), gB = makeGuard(); gA.root.position.set(-4.3, 0, 0); gB.root.position.set(4.3, 0, 0); gA.root.rotation.y = .22; gB.root.rotation.y = -.22;
+  gGroup.visible = false;
+  var G_T = 7.2, gTime = -1, gBowing = false, gt1 = new T.Vector3(), gt2 = new T.Vector3(), gS1 = new T.Vector3(), gS2 = new T.Vector3();
+  var G_SIDE = new T.Vector3(.62, -.02, .1), G_GUN = new T.Vector3(-.5, .1, .5), G_HEAD = new T.Vector3(.46, 2.1, .12), G_CHEST = new T.Vector3(.15, .98, .52);
+  var G_HAT_HEAD = new T.Vector3(0, 2.12, .02), G_HAT_CHEST = new T.Vector3(.02, 1.0, .52), G_BR = new T.Vector3(.7, -.55, -.35), G_BL = new T.Vector3(-.7, -.55, -.35);
+  function poseGuard(g, u) {
+    u = ((u % G_T) + G_T) % G_T;
+    var w = ss(1.0, 2.0, u) * (1 - ss(5.2, 6.0, u));            // hat: head -> chest -> head
+    g.hat.position.lerpVectors(G_HAT_HEAD, G_HAT_CHEST, w); g.hat.rotation.set(.02 + w * 1.28, 0, 0); g.hat.scale.setScalar(1 - .2 * w);
+    if (u < .6) gt1.copy(G_SIDE); else if (u < 1.4) gt1.lerpVectors(G_SIDE, G_HEAD, ss(.6, 1.4, u)); else if (u < 5.2) gt1.lerpVectors(G_HEAD, G_CHEST, w); else if (u < 6.4) gt1.lerpVectors(G_HEAD, G_SIDE, ss(5.2, 6.4, u)); else gt1.copy(G_SIDE);
+    var bend = ss(1.7, 3.0, u) * (1 - ss(4.4, 5.6, u));
+    g.torso.rotation.x = bend * .6; g.head.rotation.x = bend * .28;
+    gS1.copy(g.aR.shoulder.position); gS2.copy(g.aL.shoulder.position);
+    gSolve(g.aR, gS1, gt1, G_BR); gt2.copy(G_GUN); gSolve(g.aL, gS2, gt2, G_BL);
+    return bend;
+  }
+  function updateGuards(dt, t, cer) {
+    var show = drv > .02 || cer; gGroup.visible = show;
+    if (!show) { gTime = -1; return; }
+    if (cer && gTime < 0) gTime = 0; if (!cer) gTime = -1; if (gTime >= 0) gTime += dt;
+    var u = gTime >= 0 ? gTime : 0, bw = 0;
+    [[gA, 0], [gB, .25]].forEach(function (p, i) { var b = poseGuard(p[0], u - p[1]); if (i === 0) bw = b; p[0].root.position.y = Math.sin(t * 1.3 + i) * .01; });
+    var nb = bw > .3; if (nb !== gBowing) { gBowing = nb; if (nb && M.sound) M.sound.chime(2); }
+  }
+
   /* ---------- public API ---------- */
   var gate = { t: -1, done: false }, lights = { flash: 0 }, engine = { on: false, t: 0, rev: 0 }, shake = 0;
   M.sparkle = function (x, y, n) { burstAt(w2s(x, y, 12), n || 50, 5); };
@@ -643,6 +720,7 @@
   function setBeams(c, k) { c.userData.t.beams.forEach(function (b) { b.intensity = k * 3.2; }); }
 
   var cT = new T.Color(0x0b1233), cM = new T.Color(0x9a4220), cB = new T.Color(0xf6b255);
+  var drv = 0, roadZ = 0;
   function frame() {
     requestAnimationFrame(frame); if (document.hidden) return;
     var dt = Math.min(.05, clock.getDelta()), t = clock.elapsedTime; timeU.value = t;
@@ -718,14 +796,16 @@
     }
 
     // finale
-    var atEnd = sY > moodA + (moodB - moodA) * .55;
-    fin.userData.wheels.forEach(function (w) { w.userData.spin.rotation.z -= dt * (atEnd ? 22 : 0); });
-    var driving = atEnd ? 1 : 0;
+    var atEnd = sY > moodA + (moodB - moodA) * .55, cer = sY > moodA + (moodB - moodA) * .86;
+    var driveTo = atEnd && !cer ? 1 : 0; drv += (driveTo - drv) * Math.min(1, dt * 1.4); roadZ += dt * 28 * drv;
+    fin.userData.wheels.forEach(function (w) { w.userData.spin.rotation.z -= dt * 22 * drv; });
+    var driving = drv;
     fin.userData.t.tail.emissiveIntensity = .5 + driving * 1.4; fin.userData.t.head.emissiveIntensity = 1.2; setBeams(fin, .55);
     fin.position.y = Math.sin(t * 9) * .006 * driving;
-    var base = (t * 28 * driving) % 5.5; if (!driving) base = 0;
+    var base = roadZ % 5.5;
     dashes.forEach(function (d, i) { d.position.set(0, .02, -92 - ((i * 5.5 + base) % 220)); d.visible = mood > .02; });
-    lamps.forEach(function (pl, i) { var s = pl.userData.side; pl.position.set(s * 7.5, 0, -88 - ((Math.floor(i / 2) * 14 + (t * 28 * driving)) % 224)); pl.visible = mood > .02; });
+    lamps.forEach(function (pl, i) { var s = pl.userData.side; pl.position.set(s * 7.5, 0, -88 - ((Math.floor(i / 2) * 14 + roadZ) % 224)); pl.visible = mood > .02; });
+    updateGuards(dt, t, cer);
     // F-22 flyover
     if (atEnd) { if (!wasEnd) { nextFly = t + 1.5; } wasEnd = true; if (flyT < 0 && t > nextFly) { flyT = 0; if (M.sound) M.sound.whoosh(); } } else wasEnd = false;
     var rb = raptor.userData;
@@ -745,6 +825,6 @@
   }
   var lastSpinCar = -1;
   renderer.render(scene, camera);
-  if (location.hash === '#debug') window.__magic = { camera: camera, THREE: T, cars: cars, P: P, scene: scene, fin: fin, alive: function () { var n = 0; for (var i = 0; i < PN; i++) if (pLife[i] > 0) n++; return n; }, keys: function () { return keys; }, sY: function () { return sY; } };
+  if (location.hash === '#debug') window.__magic = { setY: function (v) { sY = v; }, setG: function (v) { gTime = v; }, camera: camera, THREE: T, cars: cars, P: P, scene: scene, fin: fin, alive: function () { var n = 0; for (var i = 0; i < PN; i++) if (pLife[i] > 0) n++; return n; }, keys: function () { return keys; }, sY: function () { return sY; } };
   frame();
 })();
