@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { notFound } from "next/navigation";
+import Script from "next/script";
 import "@fontsource/libre-franklin/800.css";
 import "@fontsource-variable/montserrat/index.css";
 import "@fontsource/noto-sans-arabic/400.css";
@@ -9,6 +10,8 @@ import "../globals.css";
 import { LOCALES, dirOf, isLocale, type Locale } from "@/i18n/config";
 import { getDict } from "@/lib/dictionaries";
 import { SITE } from "@/lib/site";
+
+const GA_ID = process.env.NEXT_PUBLIC_GA_ID ?? "G-S5BJT10FK9";
 
 export const viewport: Viewport = {
   themeColor: "#020326",
@@ -90,6 +93,14 @@ export default async function RootLayout({
         >
           {d.skip}
         </a>
+        {GA_ID && (
+          <>
+            <Script src={`https://www.googletagmanager.com/gtag/js?id=${GA_ID}`} strategy="afterInteractive" />
+            <Script id="ga4-init" strategy="afterInteractive">
+              {`window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','${GA_ID}');`}
+            </Script>
+          </>
+        )}
         {children}
       </body>
     </html>
