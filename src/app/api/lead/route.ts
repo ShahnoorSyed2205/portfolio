@@ -1,4 +1,6 @@
 import { NextResponse } from "next/server";
+import nodemailer from "nodemailer";
+import { leadEmail } from "@/lib/leadEmail";
 
 export const runtime = "nodejs";
 
@@ -57,8 +59,33 @@ export async function POST(req: Request) {
 
   const lead = { topic, name, contact, amount, currency, message, locale, receivedAt: new Date().toISOString() };
 
-  // Deliver to any webhook (Make, Zapier, Slack, CRM). Without one the lead is only logged.
+  // Email the desk through the Hostinger mailbox when SMTP_PASS is set.
+  const smtpPass = process.env.SMTP_PASS;
   const hook = process.env.LEAD_WEBHOOK_URL;
+  if (smtpPass) {
+    const user = process.env.SMTP_USER ?? "info@369-ltd.com";
+    try {
+      const transport = nodemailer.createTransport({
+        host: process.env.SMTP_HOST ?? "smtp.hostinger.com",
+        port: Number(process.env.SMTP_PORT ?? 465),
+        secure: true,
+        auth: { user, pass: smtpPass },
+      });
+      const mail = leadEmail(lead);
+      await transport.sendMail({
+        from: `"369 LTD Enquiries" <${user}>`,
+        to: process.env.LEAD_TO ?? user,
+        replyTo: mail.replyTo,
+        subject: mail.subject,
+        text: mail.text,
+        html: mail.html,
+      });
+    } catch (err) {
+      console.error("[lead] email delivery failed", err);
+      return NextResponse.json({ ok: false, error: "delivery_failed" }, { status: 502 });
+    }
+  }
+  // Optional webhook (Make, Zapier, Slack, CRM).
   if (hook) {
     try {
       const res = await fetch(hook, {
@@ -71,8 +98,9 @@ export async function POST(req: Request) {
       console.error("[lead] webhook delivery failed", err);
       return NextResponse.json({ ok: false, error: "delivery_failed" }, { status: 502 });
     }
-  } else {
-    console.warn("[lead] LEAD_WEBHOOK_URL not set, lead was not delivered anywhere", lead.topic, lead.receivedAt);
+  }
+  if (!smtpPass && !hook) {
+    console.warn("[lead] no SMTP_PASS or LEAD_WEBHOOK_URL set, lead was not delivered anywhere", lead.topic, lead.receivedAt);
   }
 
   return NextResponse.json({ ok: true });

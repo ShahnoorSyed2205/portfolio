@@ -8,8 +8,8 @@ export const SITE = {
     country: "AE",
     poBox: "414494",
   },
-  // Contact channels are only shown when configured. Confirm with the client before setting.
+  // Contact channels; env vars override these defaults.
   email: process.env.NEXT_PUBLIC_CONTACT_EMAIL ?? "info@369-ltd.com",
-  phone: process.env.NEXT_PUBLIC_CONTACT_PHONE,
-  whatsapp: process.env.NEXT_PUBLIC_CONTACT_WHATSAPP,
+  phone: process.env.NEXT_PUBLIC_CONTACT_PHONE ?? "+971 58 504 9254",
+  whatsapp: process.env.NEXT_PUBLIC_CONTACT_WHATSAPP ?? "+971 58 504 9254",
 } as const;
