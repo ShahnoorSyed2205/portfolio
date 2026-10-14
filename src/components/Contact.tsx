@@ -12,6 +12,7 @@ import {
 } from "@phosphor-icons/react";
 import type { Dict } from "@/i18n/en";
 import type { Locale } from "@/i18n/config";
+import { track } from "@/lib/analytics";
 import { TOPIC_EVENT } from "./TopicLink";
 
 type Channels = { email?: string; phone?: string; whatsapp?: string; instagram: string };
@@ -71,6 +72,7 @@ export function Contact({ d, locale, channels, defaultTopic }: { d: Dict; locale
           locale,
         }),
       });
+      if (res.ok) track("generate_lead", { topic, locale, page: window.location.pathname });
       setStatus(res.ok ? "success" : "error");
     } catch {
       setStatus("error");
@@ -109,7 +111,7 @@ export function Contact({ d, locale, channels, defaultTopic }: { d: Dict; locale
               </div>
             </div>
             {rows.map(({ icon: Icon, label, text, href }) => (
-              <a key={label} href={href} target={href.startsWith("http") ? "_blank" : undefined} rel="noopener noreferrer" className="flex items-start gap-4 transition hover:text-accent">
+              <a key={label} href={href} onClick={() => track("contact_click", { channel: label, locale })} target={href.startsWith("http") ? "_blank" : undefined} rel="noopener noreferrer" className="flex items-start gap-4 transition hover:text-accent">
                 <Icon size={24} weight="duotone" className="mt-1 shrink-0 text-accent" />
                 <div>
                   <p className="text-sm font-semibold text-muted">{label}</p>
@@ -171,8 +173,8 @@ export function Contact({ d, locale, channels, defaultTopic }: { d: Dict; locale
                   {errors.name && <p id="name-err" className="text-sm text-[#ffb0b0]">{errors.name}</p>}
                 </div>
                 <div className="grid gap-2">
-                  <label htmlFor="contact" className="text-sm font-semibold text-muted">{c.contactLabel}</label>
-                  <input id="contact" name="contact" autoComplete="email" aria-invalid={!!errors.contact} aria-describedby={errors.contact ? "contact-err" : undefined} className={field} dir="ltr" />
+                  <label htmlFor="contact-info" className="text-sm font-semibold text-muted">{c.contactLabel}</label>
+                  <input id="contact-info" name="contact" autoComplete="email" aria-invalid={!!errors.contact} aria-describedby={errors.contact ? "contact-err" : undefined} className={field} dir="ltr" />
                   {errors.contact && <p id="contact-err" className="text-sm text-[#ffb0b0]">{errors.contact}</p>}
                 </div>
               </div>
