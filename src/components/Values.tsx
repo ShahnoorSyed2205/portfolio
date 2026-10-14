@@ -1,11 +1,11 @@
-import { Lightbulb, LinkSimple, Lightning, ShieldCheck, UsersThree } from "@phosphor-icons/react/dist/ssr";
+import { Lightbulb, Lightning, LinkSimple, ShieldCheck, TrendUp, UsersThree } from "@phosphor-icons/react/dist/ssr";
 import type { Dict } from "@/i18n/en";
 import { Reveal } from "./Reveal";
 
-const ICONS = [Lightbulb, ShieldCheck, LinkSimple, UsersThree, Lightning];
+const ICONS = [Lightbulb, Lightning, ShieldCheck, UsersThree, TrendUp, LinkSimple];
 
-/** Five bars that climb left to right, echoing the ascending bars in the 369 mark. */
-const HEIGHTS = ["lg:h-[19rem]", "lg:h-[22rem]", "lg:h-[25rem]", "lg:h-[28rem]", "lg:h-[31rem]"];
+/** Six bars that climb in reading order, echoing the ascending bars in the 369 mark. */
+const HEIGHTS = ["lg:h-[20rem]", "lg:h-[22.5rem]", "lg:h-[25rem]", "lg:h-[27.5rem]", "lg:h-[30rem]", "lg:h-[32.5rem]"];
 
 export function Values({ d }: { d: Dict }) {
   return (
@@ -17,7 +17,7 @@ export function Values({ d }: { d: Dict }) {
           </h2>
         </Reveal>
 
-        <ul className="mt-14 grid gap-4 lg:grid-cols-5 lg:items-end">
+        <ul className="mt-14 grid gap-4 lg:grid-cols-6 lg:items-end">
           {d.values.items.map((v, i) => {
             const Icon = ICONS[i];
             const t = i / (d.values.items.length - 1);
@@ -25,15 +25,15 @@ export function Values({ d }: { d: Dict }) {
               <li key={v.title}>
                 <Reveal delay={i * 0.07} className="h-full">
                   <div
-                    className={`panel relative flex flex-col justify-between overflow-hidden p-7 ${HEIGHTS[i]}`}
+                    className={`panel relative flex flex-col justify-between overflow-hidden p-6 ${HEIGHTS[i]}`}
                     style={{
                       backgroundImage: `linear-gradient(180deg, transparent 25%, rgb(62 243 238 / ${(0.05 + t * 0.2).toFixed(2)})), linear-gradient(145deg, rgb(255 255 255 / 0.07), rgb(255 255 255 / 0.015))`,
                     }}
                   >
                     <Icon size={34} weight="duotone" className="text-accent" />
                     <div className="mt-10 lg:mt-0">
-                      <h3 className="font-display text-2xl font-extrabold">{v.title}</h3>
-                      <p className="mt-3 text-muted">{v.text}</p>
+                      <h3 className="font-display text-xl font-extrabold">{v.title}</h3>
+                      <p className="mt-3 text-sm text-muted">{v.text}</p>
                     </div>
                   </div>
                 </Reveal>

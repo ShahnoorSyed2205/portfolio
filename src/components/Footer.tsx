@@ -26,6 +26,7 @@ export function Footer({ d }: { d: Dict; locale?: Locale }) {
             <span className="font-display text-2xl font-extrabold" dir="ltr">369 LTD</span>
           </div>
           <p className="mt-5 max-w-xs text-lg text-fg/90">{d.footer.tagline}</p>
+          <p className="mt-1 max-w-xs text-muted">{d.footer.altTagline}</p>
           <a
             href={SITE.instagram}
             target="_blank"
@@ -57,6 +58,7 @@ export function Footer({ d }: { d: Dict; locale?: Locale }) {
 
       <div className="relative border-t border-white/10">
         <div className="mx-auto flex max-w-7xl flex-col gap-4 px-5 py-8 text-sm text-muted md:px-8">
+          <p className="max-w-3xl font-semibold text-fg/90">{d.footer.licence}</p>
           <p className="max-w-3xl">{d.footer.disclaimer}</p>
           <p>
             <span dir="ltr">© {new Date().getFullYear()} 369 LTD.</span> {d.footer.rights}

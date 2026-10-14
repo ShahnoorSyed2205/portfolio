@@ -24,6 +24,7 @@ export function Nav({ locale, d }: { locale: Locale; d: Dict }) {
   const links = [
     { href: "#services", label: d.nav.services },
     { href: "#property", label: d.nav.flow },
+    { href: "#clients", label: d.nav.audience },
     { href: "#office", label: d.nav.office },
     { href: "#faq", label: d.nav.faq },
   ];

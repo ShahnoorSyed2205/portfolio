@@ -1,0 +1,13 @@
+# 369 LTD
+
+> 369 LTD is a Dubai-based fintech licensed by Digital Assets Oasis (Ras Al Khaimah). It offers AI-driven crypto analysis, buying and selling of digital assets (including USDT), and Crypto Click Payments for real estate, services and commerce. Tagline: "Where crypto meets reality." Languages: English and Arabic.
+
+## Key facts
+- Based at Ground Floor, Office 201, API World Tower, Sheikh Zayed Road, Dubai, UAE (PO Box 414494).
+- Serves investors and traders, real estate agencies and developers, businesses and merchants, and institutional partners across the UAE and MENA.
+- "369" stands for balance, logic and manifestation.
+- Digital assets are volatile. Nothing here is investment advice.
+
+## Pages
+- [English home](https://369ltd.vercel.app/en): services, how property payments work, clients, office, FAQ, contact.
+- [Arabic home](https://369ltd.vercel.app/ar): the same content in Arabic (right-to-left).

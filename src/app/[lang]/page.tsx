@@ -4,6 +4,7 @@ import { getDict } from "@/lib/dictionaries";
 import { buildJsonLd } from "@/lib/jsonld";
 import { SITE } from "@/lib/site";
 import { About } from "@/components/About";
+import { Audience } from "@/components/Audience";
 import { Contact } from "@/components/Contact";
 import { Faq } from "@/components/Faq";
 import { Flow } from "@/components/Flow";
@@ -33,6 +34,7 @@ export default async function Home({ params }: { params: Promise<{ lang: string 
         <About d={d} />
         <Services d={d} />
         <Flow d={d} />
+        <Audience d={d} />
         <Office d={d} lang={lang} />
         <Values d={d} />
         <Faq d={d} />

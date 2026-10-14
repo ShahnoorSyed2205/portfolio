@@ -1,7 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import { KhatamPattern } from "./Khatam";
 
@@ -22,10 +22,24 @@ const HeroScene = dynamic(() => import("./HeroScene"), { ssr: false });
 
 export function SceneLoader({ label }: { label: string }) {
   const [ready, setReady] = useState(false);
+  const [mount, setMount] = useState(false);
+
+  // Keep three.js off the critical path: text and poster paint first, the scene loads once the page is idle.
+  useEffect(() => {
+    const start = () => {
+      const ric = (window as unknown as { requestIdleCallback?: (cb: () => void, o?: { timeout: number }) => number }).requestIdleCallback;
+      if (ric) ric(() => setMount(true), { timeout: 3000 });
+      else setTimeout(() => setMount(true), 1200);
+    };
+    if (document.readyState === "complete") start();
+    else window.addEventListener("load", start, { once: true });
+    return () => window.removeEventListener("load", start);
+  }, []);
+
   return (
     <>
       {!ready && <Poster />}
-      <HeroScene label={label} onReady={() => setReady(true)} />
+      {mount && <HeroScene label={label} onReady={() => setReady(true)} />}
     </>
   );
 }

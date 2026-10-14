@@ -19,7 +19,8 @@ export function buildJsonLd(locale: Locale, d: Dict) {
         url: SITE.url,
         logo: `${SITE.url}/brand/icon-512.png`,
         image: `${SITE.url}/media/og.jpg`,
-        slogan: "Where crypto meets reality",
+        slogan: d.footer.tagline,
+        alternateName: ["369 LTD Dubai", "369 ليميتد"],
         description: d.meta.description,
         sameAs,
         areaServed: [
@@ -43,6 +44,14 @@ export function buildJsonLd(locale: Locale, d: Dict) {
         ...(SITE.email ? { email: SITE.email } : {}),
         ...(SITE.phone ? { telephone: SITE.phone } : {}),
         availableLanguage: ["English", "Arabic"],
+        hasOfferCatalog: {
+          "@type": "OfferCatalog",
+          name: locale === "ar" ? "خدمات 369 ليميتد" : "369 LTD services",
+          itemListElement: d.services.items.map((item) => ({
+            "@type": "Offer",
+            itemOffered: { "@type": "Service", name: item.title, description: item.text, provider: { "@id": orgId } },
+          })),
+        },
       },
       {
         "@type": "WebSite",

@@ -25,6 +25,18 @@ export function About({ d }: { d: Dict }) {
               <figcaption className="mt-4 text-sm font-medium text-accent">{d.about.meaning}</figcaption>
             </figure>
           </Reveal>
+          <Reveal delay={0.2}>
+            <dl className="mt-12 grid max-w-[38rem] gap-8 sm:grid-cols-2">
+              <div>
+                <dt className="font-display text-lg font-extrabold">{d.about.visionTitle}</dt>
+                <dd className="mt-2 text-muted">{d.about.vision}</dd>
+              </div>
+              <div>
+                <dt className="font-display text-lg font-extrabold">{d.about.missionTitle}</dt>
+                <dd className="mt-2 text-muted">{d.about.mission}</dd>
+              </div>
+            </dl>
+          </Reveal>
         </div>
 
         <Reveal delay={0.1} className="relative mx-auto w-full max-w-md lg:max-w-none">
