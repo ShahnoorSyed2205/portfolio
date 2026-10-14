@@ -9,5 +9,12 @@
 - Digital assets are volatile. Nothing here is investment advice.
 
 ## Pages
-- [English home](https://369ltd.vercel.app/en): services, how property payments work, clients, office, FAQ, contact.
-- [Arabic home](https://369ltd.vercel.app/ar): the same content in Arabic (right-to-left).
+- [English home](https://369-ltd.com/en): services, how property payments work, clients, office, FAQ, contact.
+- [Arabic home](https://369-ltd.com/ar): the same content in Arabic (right-to-left).
+
+## Service pages
+- [Buy and sell USDT in Dubai](https://369-ltd.com/en/usdt-desk)
+- [Pay for Dubai property with crypto](https://369-ltd.com/en/property-payments)
+- [Crypto Click Payments](https://369-ltd.com/en/crypto-click-payments)
+- [About 369 LTD](https://369-ltd.com/en/about)
+Arabic versions: replace /en/ with /ar/.

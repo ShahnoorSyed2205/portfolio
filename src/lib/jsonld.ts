@@ -1,6 +1,7 @@
 import type { Locale } from "@/i18n/config";
 import type { Dict } from "@/i18n/en";
 import { SITE } from "./site";
+import { PAGES, type Slug } from "@/i18n/pages";
 
 export function buildJsonLd(locale: Locale, d: Dict) {
   const url = `${SITE.url}/${locale}`;
@@ -83,4 +84,51 @@ export function buildJsonLd(locale: Locale, d: Dict) {
       },
     ],
   };
+}
+
+export function buildPageJsonLd(locale: Locale, slug: Slug, d: Dict) {
+  const p = PAGES[locale][slug];
+  const url = `${SITE.url}/${locale}/${slug}`;
+  const orgId = `${SITE.url}/#organization`;
+  const lang = locale === "ar" ? "ar-AE" : "en-AE";
+  const graph: Record<string, unknown>[] = [
+    {
+      "@type": "WebPage",
+      "@id": `${url}#webpage`,
+      url,
+      name: p.title,
+      description: p.description,
+      inLanguage: lang,
+      isPartOf: { "@id": `${SITE.url}/#website` },
+      about: { "@id": orgId },
+      breadcrumb: { "@id": `${url}#breadcrumb` },
+    },
+    {
+      "@type": "BreadcrumbList",
+      "@id": `${url}#breadcrumb`,
+      itemListElement: [
+        { "@type": "ListItem", position: 1, name: "369 LTD", item: `${SITE.url}/${locale}` },
+        { "@type": "ListItem", position: 2, name: p.navLabel, item: url },
+      ],
+    },
+    {
+      "@type": "FAQPage",
+      "@id": `${url}#faq`,
+      inLanguage: lang,
+      mainEntity: p.faq.map((f) => ({ "@type": "Question", name: f.q, acceptedAnswer: { "@type": "Answer", text: f.a } })),
+    },
+  ];
+  if (slug !== "about") {
+    graph.push({
+      "@type": "Service",
+      "@id": `${url}#service`,
+      name: p.h1,
+      description: p.description,
+      url,
+      inLanguage: lang,
+      provider: { "@id": orgId },
+      areaServed: [{ "@type": "Country", name: "United Arab Emirates" }, { "@type": "Place", name: "Dubai" }],
+    });
+  }
+  return { "@context": "https://schema.org", "@graph": graph };
 }

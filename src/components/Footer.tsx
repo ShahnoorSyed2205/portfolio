@@ -3,15 +3,16 @@ import { InstagramLogo } from "@phosphor-icons/react/dist/ssr";
 import type { Dict } from "@/i18n/en";
 import type { Locale } from "@/i18n/config";
 import { SITE } from "@/lib/site";
+import { PAGES, SLUGS } from "@/i18n/pages";
 import { KhatamPattern } from "./Khatam";
 
-export function Footer({ d }: { d: Dict; locale?: Locale }) {
+export function Footer({ d, locale = "en", base = "" }: { d: Dict; locale?: Locale; base?: string }) {
   const links = [
-    { href: "#services", label: d.nav.services },
-    { href: "#property", label: d.nav.flow },
-    { href: "#office", label: d.nav.office },
-    { href: "#principles", label: d.nav.values },
-    { href: "#faq", label: d.nav.faq },
+    { href: `${base}#services`, label: d.nav.services },
+    { href: `${base}#property`, label: d.nav.flow },
+    { href: `${base}#office`, label: d.nav.office },
+    { href: `${base}#principles`, label: d.nav.values },
+    { href: `${base}#faq`, label: d.nav.faq },
   ];
 
   return (
@@ -38,15 +39,27 @@ export function Footer({ d }: { d: Dict; locale?: Locale }) {
           </a>
         </div>
 
-        <nav aria-label="Footer">
-          <p className="text-sm font-semibold text-muted">{d.footer.explore}</p>
-          <ul className="mt-4 grid gap-3">
-            {links.map((l) => (
-              <li key={l.href}>
-                <a href={l.href} className="transition hover:text-accent">{l.label}</a>
-              </li>
-            ))}
-          </ul>
+        <nav aria-label="Footer" className="grid grid-cols-2 gap-8">
+          <div>
+            <p className="text-sm font-semibold text-muted">{d.footer.explore}</p>
+            <ul className="mt-4 grid gap-3">
+              {links.map((l) => (
+                <li key={l.href}>
+                  <a href={l.href} className="transition hover:text-accent">{l.label}</a>
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div>
+            <p className="text-sm font-semibold text-muted">{d.nav.services}</p>
+            <ul className="mt-4 grid gap-3">
+              {SLUGS.map((slug) => (
+                <li key={slug}>
+                  <a href={`/${locale}/${slug}`} className="transition hover:text-accent">{PAGES[locale][slug].navLabel}</a>
+                </li>
+              ))}
+            </ul>
+          </div>
         </nav>
 
         <address className="not-italic">

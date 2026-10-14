@@ -32,7 +32,7 @@ export default async function Home({ params }: { params: Promise<{ lang: string 
         <Hero d={d} />
         <Marquee items={d.marquee} />
         <About d={d} />
-        <Services d={d} />
+        <Services d={d} locale={lang} />
         <Flow d={d} />
         <Audience d={d} />
         <Office d={d} lang={lang} />

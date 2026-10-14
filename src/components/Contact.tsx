@@ -24,9 +24,9 @@ const PHONE = /^\+?[0-9\s().-]{7,20}$/;
 const field =
   "w-full rounded-[14px] border border-white/30 bg-ink-900 px-4 py-3.5 text-base text-fg placeholder:text-muted/80 transition focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/40 aria-[invalid=true]:border-[#ff8a8a]";
 
-export function Contact({ d, locale, channels }: { d: Dict; locale: Locale; channels: Channels }) {
+export function Contact({ d, locale, channels, defaultTopic }: { d: Dict; locale: Locale; channels: Channels; defaultTopic?: string }) {
   const c = d.contact;
-  const [topic, setTopic] = useState(c.topics[0].value);
+  const [topic, setTopic] = useState(defaultTopic ?? c.topics[0].value);
   const [status, setStatus] = useState<Status>("idle");
   const [errors, setErrors] = useState<Errors>({});
 

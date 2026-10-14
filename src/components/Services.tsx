@@ -8,6 +8,8 @@ import {
   Brain,
 } from "@phosphor-icons/react/dist/ssr";
 import type { Dict } from "@/i18n/en";
+import type { Locale } from "@/i18n/config";
+import { PAGES, SLUGS } from "@/i18n/pages";
 import { KhatamPattern } from "./Khatam";
 import { Reveal } from "./Reveal";
 import { TiltCard } from "./TiltCard";
@@ -16,7 +18,7 @@ import { TopicLink } from "./TopicLink";
 const link =
   "mt-6 inline-flex items-center gap-2 text-sm font-semibold text-accent transition hover:gap-3";
 
-export function Services({ d }: { d: Dict }) {
+export function Services({ d, locale }: { d: Dict; locale: Locale }) {
   const [usdt, property, ai, oneClick, business] = d.services.items;
   const icon = "size-11 rounded-full border border-white/20 bg-ink-950/50 p-2.5 text-accent";
 
@@ -109,6 +111,15 @@ export function Services({ d }: { d: Dict }) {
             </TiltCard>
           </Reveal>
         </div>
+
+        <nav aria-label={d.nav.services} className="mt-8 flex flex-wrap gap-3">
+          {SLUGS.map((slug) => (
+            <a key={slug} href={`/${locale}/${slug}`} className="inline-flex h-11 items-center gap-2 whitespace-nowrap rounded-full border border-white/25 px-5 text-sm font-semibold transition hover:border-accent hover:text-accent">
+              {PAGES[locale][slug].navLabel}
+              <ArrowUpRight weight="bold" className="rtl:-scale-x-100" />
+            </a>
+          ))}
+        </nav>
       </div>
     </section>
   );

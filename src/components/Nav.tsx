@@ -8,7 +8,7 @@ import type { Dict } from "@/i18n/en";
 import type { Locale } from "@/i18n/config";
 import { LangToggle } from "./LangToggle";
 
-export function Nav({ locale, d }: { locale: Locale; d: Dict }) {
+export function Nav({ locale, d, base = "" }: { locale: Locale; d: Dict; base?: string }) {
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
@@ -22,11 +22,11 @@ export function Nav({ locale, d }: { locale: Locale; d: Dict }) {
   }, [open]);
 
   const links = [
-    { href: "#services", label: d.nav.services },
-    { href: "#property", label: d.nav.flow },
-    { href: "#clients", label: d.nav.audience },
-    { href: "#office", label: d.nav.office },
-    { href: "#faq", label: d.nav.faq },
+    { href: `${base}#services`, label: d.nav.services },
+    { href: `${base}#property`, label: d.nav.flow },
+    { href: `${base}#clients`, label: d.nav.audience },
+    { href: `${base}#office`, label: d.nav.office },
+    { href: `${base}#faq`, label: d.nav.faq },
   ];
 
   const cta =
@@ -52,7 +52,7 @@ export function Nav({ locale, d }: { locale: Locale; d: Dict }) {
 
         <div className="flex items-center gap-3">
           <LangToggle locale={locale} label={d.nav.switchLabel} text={d.nav.switchText} />
-          <a href="#contact" className={`${cta} hidden sm:inline-flex`}>
+          <a href={`${base}#contact`} className={`${cta} hidden sm:inline-flex`}>
             {d.nav.cta}
           </a>
           <button
@@ -82,7 +82,7 @@ export function Nav({ locale, d }: { locale: Locale; d: Dict }) {
               </a>
             ))}
           </nav>
-          <a href="#contact" onClick={() => setOpen(false)} className={`${cta} mt-8 inline-flex w-full justify-center`}>
+          <a href={`${base}#contact`} onClick={() => setOpen(false)} className={`${cta} mt-8 inline-flex w-full justify-center`}>
             {d.nav.cta}
           </a>
         </div>
